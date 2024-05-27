@@ -4,7 +4,19 @@ let drawing = false;
 let currentPath = [];
 let history = [];
 
-// 开始绘制
+// 调整canvas的尺寸
+function resizeCanvas() {
+    const container = document.getElementById('canvas-container');
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// 监听窗口调整大小事件，调整canvas尺寸
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 canvas.addEventListener('mousedown', (event) => {
     drawing = true;
     currentPath = [];
@@ -12,13 +24,11 @@ canvas.addEventListener('mousedown', (event) => {
     draw(event);
 });
 
-// 停止绘制
 canvas.addEventListener('mouseup', () => {
     drawing = false;
     context.beginPath();
 });
 
-// 移动鼠标时绘制
 canvas.addEventListener('mousemove', draw);
 
 function draw(event) {
@@ -27,23 +37,21 @@ function draw(event) {
     context.lineCap = 'round';
     context.strokeStyle = '#000';
 
-    const x = event.clientX - canvas.offsetLeft;
-    const y = event.clientY - canvas.offsetTop;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
     context.lineTo(x, y);
     context.stroke();
     context.beginPath();
     context.moveTo(x, y);
 
-    // 保存路径点到当前路径中
     currentPath.push({ x, y });
 }
 
-// 保存绘制内容到数据库
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 async function saveDrawing() {
-    // 扁平化历史数据为对象数组
     const flatHistory = history.reduce((acc, path, index) => {
         const flatPath = path.map(point => ({
             x: point.x,
@@ -65,7 +73,6 @@ async function saveDrawing() {
     }
 }
 
-// 加载数据库中的绘制内容
 async function loadDrawings() {
     const q = db.collection('drawings').orderBy('createdAt', 'asc');
     const querySnapshot = await q.get();
