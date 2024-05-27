@@ -1,19 +1,24 @@
-body {
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: url('background.jpg') no-repeat center center fixed;
-    background-size: cover;
+    background-color: #f0f0f0;
 }
 
 #canvas-container {
-    border: 1px solid #ccc;
-    background-color: rgba(255, 255, 255, 0.8); /* 背景半透明以便显示背景图片 */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-button {
-    margin-top: 10px;
+#drawing-canvas {
+    background: url('your-background-image.jpg') no-repeat center center;
+    background-size: contain; /* 使背景图像适应画布 */
+    height: 80vh; /* 高度固定为视口高度的80% */
+    width: auto; /* 宽度自适应 */
+    border: 1px solid #ccc;
 }
