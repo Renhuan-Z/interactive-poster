@@ -43,13 +43,18 @@ function draw(event) {
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 async function saveDrawing() {
+    // 扁平化历史数据
+    const flatHistory = history.reduce((acc, path) => {
+        return acc.concat(path);
+    }, []);
+
     try {
         await db.collection('drawings').add({
-            history: history,
+            history: flatHistory,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         alert('Drawing saved');
-        console.log('Drawing saved:', history);
+        console.log('Drawing saved:', flatHistory);
     } catch (error) {
         console.error('Error saving drawing:', error);
     }
@@ -62,16 +67,16 @@ async function loadDrawings() {
     querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
         console.log('Loaded drawing:', drawingHistory);
-        drawingHistory.forEach(path => {
-            context.beginPath();
-            path.forEach((point, index) => {
-                if (index === 0) {
-                    context.moveTo(point.x, point.y);
-                } else {
-                    context.lineTo(point.x, point.y);
-                }
-            });
-            context.stroke();
+        let lastPoint = null;
+        drawingHistory.forEach((point, index) => {
+            if (index === 0 || lastPoint === null) {
+                context.beginPath();
+                context.moveTo(point.x, point.y);
+            } else {
+                context.lineTo(point.x, point.y);
+                context.stroke();
+            }
+            lastPoint = point;
         });
     });
 }
