@@ -1,6 +1,3 @@
-import { db } from './firebaseConfig.js';
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
-
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -47,21 +44,21 @@ document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 async function saveDrawing() {
     try {
-        await addDoc(collection(db, 'drawings'), {
+        await db.collection('drawings').add({
             history: history,
             createdAt: new Date()
         });
         alert('Drawing saved');
         console.log('Drawing saved:', history);
     } catch (error) {
-        console.error('Error saving drawing: ', error);
+        console.error('Error saving drawing:', error);
     }
 }
 
 // 加载数据库中的绘制内容
 async function loadDrawings() {
-    const q = query(collection(db, 'drawings'), orderBy('createdAt', 'asc'));
-    const querySnapshot = await getDocs(q);
+    const q = db.collection('drawings').orderBy('createdAt', 'asc');
+    const querySnapshot = await q.get();
     querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
         console.log('Loaded drawing:', drawingHistory);
@@ -77,6 +74,10 @@ async function loadDrawings() {
             context.stroke();
         });
     });
+}
+
+window.onload = loadDrawings;
+
 }
 
 window.onload = loadDrawings;
