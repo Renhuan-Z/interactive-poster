@@ -4,12 +4,12 @@ let drawing = false;
 let currentPath = [];
 let history = [];
 
-// 调整canvas的尺寸
+// 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
-    const container = document.getElementById('canvas-container');
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    context.fillStyle = "#FFFFFF";
+    const backgroundImage = document.getElementById('background-image');
+    canvas.width = backgroundImage.clientWidth;
+    canvas.height = backgroundImage.clientHeight;
+    context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -103,4 +103,3 @@ async function loadDrawings() {
 }
 
 window.onload = loadDrawings;
-
