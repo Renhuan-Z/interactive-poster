@@ -1,4 +1,4 @@
-import { db } from './firebaseConfig';
+import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
 
 const canvas = document.getElementById('drawing-canvas');
@@ -52,6 +52,7 @@ async function saveDrawing() {
             createdAt: new Date()
         });
         alert('Drawing saved');
+        console.log('Drawing saved:', history);
     } catch (error) {
         console.error('Error saving drawing: ', error);
     }
@@ -63,10 +64,20 @@ async function loadDrawings() {
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
+        console.log('Loaded drawing:', drawingHistory);
         drawingHistory.forEach(path => {
             context.beginPath();
             path.forEach((point, index) => {
                 if (index === 0) {
                     context.moveTo(point.x, point.y);
-                } 
+                } else {
+                    context.lineTo(point.x, point.y);
+                }
+            });
+            context.stroke();
+        });
+    });
+}
+
+window.onload = loadDrawings;
 
