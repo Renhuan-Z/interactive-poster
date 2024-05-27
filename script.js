@@ -43,10 +43,11 @@ function draw(event) {
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 async function saveDrawing() {
-    // 将路径数据转换为扁平的对象数组
+    // 扁平化历史数据为对象数组
     const flatHistory = history.reduce((acc, path, index) => {
         const flatPath = path.map(point => ({
-            ...point,
+            x: point.x,
+            y: point.y,
             pathIndex: index
         }));
         return acc.concat(flatPath);
@@ -78,9 +79,9 @@ async function loadDrawings() {
             }
             acc[point.pathIndex].push({ x: point.x, y: point.y });
             return acc;
-        }, []);
+        }, {});
 
-        paths.forEach(path => {
+        Object.values(paths).forEach(path => {
             context.beginPath();
             path.forEach((point, index) => {
                 if (index === 0) {
@@ -95,3 +96,4 @@ async function loadDrawings() {
 }
 
 window.onload = loadDrawings;
+
