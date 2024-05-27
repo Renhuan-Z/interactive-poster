@@ -43,9 +43,13 @@ function draw(event) {
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 async function saveDrawing() {
-    // 扁平化历史数据
-    const flatHistory = history.reduce((acc, path) => {
-        return acc.concat(path);
+    // 将路径数据转换为扁平的对象数组
+    const flatHistory = history.reduce((acc, path, index) => {
+        const flatPath = path.map(point => ({
+            ...point,
+            pathIndex: index
+        }));
+        return acc.concat(flatPath);
     }, []);
 
     try {
@@ -67,16 +71,25 @@ async function loadDrawings() {
     querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
         console.log('Loaded drawing:', drawingHistory);
-        let lastPoint = null;
-        drawingHistory.forEach((point, index) => {
-            if (index === 0 || lastPoint === null) {
-                context.beginPath();
-                context.moveTo(point.x, point.y);
-            } else {
-                context.lineTo(point.x, point.y);
-                context.stroke();
+
+        const paths = drawingHistory.reduce((acc, point) => {
+            if (!acc[point.pathIndex]) {
+                acc[point.pathIndex] = [];
             }
-            lastPoint = point;
+            acc[point.pathIndex].push({ x: point.x, y: point.y });
+            return acc;
+        }, []);
+
+        paths.forEach(path => {
+            context.beginPath();
+            path.forEach((point, index) => {
+                if (index === 0) {
+                    context.moveTo(point.x, point.y);
+                } else {
+                    context.lineTo(point.x, point.y);
+                }
+            });
+            context.stroke();
         });
     });
 }
