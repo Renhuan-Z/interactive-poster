@@ -6,7 +6,7 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
-    background-image: url('public/background.png');
+    background-image: url('public/background.jpg');
     background-size: cover;
     background-position: center;
 }
