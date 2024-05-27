@@ -1,18 +1,20 @@
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
+let currentPath = [];
 let history = [];
 
 // 开始绘制
 canvas.addEventListener('mousedown', (event) => {
     drawing = true;
-    history.push([]);
+    currentPath = [];
     draw(event);
 });
 
 // 停止绘制
 canvas.addEventListener('mouseup', () => {
     drawing = false;
+    history.push(currentPath);
     context.beginPath();
 });
 
@@ -25,22 +27,23 @@ function draw(event) {
     context.lineCap = 'round';
     context.strokeStyle = '#000';
 
-    context.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    const x = event.clientX - canvas.offsetLeft;
+    const y = event.clientY - canvas.offsetTop;
+
+    context.lineTo(x, y);
     context.stroke();
     context.beginPath();
-    context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    context.moveTo(x, y);
 
-    // 保存路径点到历史记录中
-    history[history.length - 1].push({
-        x: event.clientX - canvas.offsetLeft,
-        y: event.clientY - canvas.offsetTop
-    });
+    // 保存路径点到当前路径中
+    currentPath.push({ x, y });
 }
 
 // 保存绘制内容到数据库
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 function saveDrawing() {
+    const dataURL = canvas.toDataURL();
     db.collection('drawings').add({
         history: history,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
