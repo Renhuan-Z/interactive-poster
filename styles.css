@@ -13,12 +13,14 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
 #drawing-canvas {
     background: url('your-background-image.jpg') no-repeat center center;
-    background-size: contain; /* 使背景图像适应画布 */
-    height: 80vh; /* 高度固定为视口高度的80% */
-    width: auto; /* 宽度自适应 */
+    background-size: cover; /* 使背景图像覆盖整个画布 */
+    width: 100%;
+    height: 100%;
     border: 1px solid #ccc;
 }
