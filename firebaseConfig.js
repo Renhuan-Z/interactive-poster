@@ -1,6 +1,4 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
+// Initialize Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
   authDomain: "interactive-poster-dad2f.firebaseapp.com",
@@ -10,8 +8,5 @@ const firebaseConfig = {
   appId: "1:759472690939:web:ad38fb62a9f1908a08025e"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export { db };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
