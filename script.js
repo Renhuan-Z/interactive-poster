@@ -1,32 +1,13 @@
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
-
-// 初始化画布历史记录
 let history = [];
 
-// 绘制函数
-function draw(event) {
-    if (!drawing) return;
-    context.lineWidth = 5;
-    context.lineCap = 'round';
-    context.strokeStyle = '#000';
-
-    context.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
-
-    // 将绘制的路径保存到历史记录中
-    history.push({
-        x: event.clientX - canvas.offsetLeft,
-        y: event.clientY - canvas.offsetTop
-    });
-}
-
 // 开始绘制
-canvas.addEventListener('mousedown', () => {
+canvas.addEventListener('mousedown', (event) => {
     drawing = true;
+    history.push([]);
+    draw(event);
 });
 
 // 停止绘制
@@ -38,13 +19,30 @@ canvas.addEventListener('mouseup', () => {
 // 移动鼠标时绘制
 canvas.addEventListener('mousemove', draw);
 
+function draw(event) {
+    if (!drawing) return;
+    context.lineWidth = 5;
+    context.lineCap = 'round';
+    context.strokeStyle = '#000';
+
+    context.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+
+    // 保存路径点到历史记录中
+    history[history.length - 1].push({
+        x: event.clientX - canvas.offsetLeft,
+        y: event.clientY - canvas.offsetTop
+    });
+}
+
 // 保存绘制内容到数据库
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
 function saveDrawing() {
-    const dataURL = canvas.toDataURL();
     db.collection('drawings').add({
-        data: dataURL,
+        history: history,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         alert('Drawing saved');
@@ -57,11 +55,18 @@ function saveDrawing() {
 async function loadDrawings() {
     const snapshot = await db.collection('drawings').orderBy('createdAt', 'asc').get();
     snapshot.forEach(doc => {
-        const img = new Image();
-        img.src = doc.data().data;
-        img.onload = () => {
-            context.drawImage(img, 0, 0);
-        };
+        const drawingHistory = doc.data().history;
+        drawingHistory.forEach(path => {
+            context.beginPath();
+            path.forEach((point, index) => {
+                if (index === 0) {
+                    context.moveTo(point.x, point.y);
+                } else {
+                    context.lineTo(point.x, point.y);
+                }
+            });
+            context.stroke();
+        });
     });
 }
 
