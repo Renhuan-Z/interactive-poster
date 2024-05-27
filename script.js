@@ -46,7 +46,7 @@ async function saveDrawing() {
     try {
         await db.collection('drawings').add({
             history: history,
-            createdAt: new Date()
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         alert('Drawing saved');
         console.log('Drawing saved:', history);
@@ -74,10 +74,6 @@ async function loadDrawings() {
             context.stroke();
         });
     });
-}
-
-window.onload = loadDrawings;
-
 }
 
 window.onload = loadDrawings;
