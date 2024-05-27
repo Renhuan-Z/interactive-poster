@@ -18,9 +18,19 @@ body, html {
 }
 
 #drawing-canvas {
-    background: url('your-background-image.jpg') no-repeat center center;
-    background-size: cover; /* 使背景图像覆盖整个画布 */
-    width: 100%;
-    height: 100%;
+    background: rgba(255, 255, 255, 0.1); /* 10% 透明度的白色覆盖层 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border: 1px solid #ccc;
+}
+
+#background-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: 80vh; /* 固定高度 */
 }
