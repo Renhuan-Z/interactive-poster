@@ -1,3 +1,6 @@
+import { db } from './firebaseConfig';
+import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -8,13 +11,13 @@ let history = [];
 canvas.addEventListener('mousedown', (event) => {
     drawing = true;
     currentPath = [];
+    history.push(currentPath);
     draw(event);
 });
 
 // 停止绘制
 canvas.addEventListener('mouseup', () => {
     drawing = false;
-    history.push(currentPath);
     context.beginPath();
 });
 
@@ -42,36 +45,28 @@ function draw(event) {
 // 保存绘制内容到数据库
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 
-function saveDrawing() {
-    const dataURL = canvas.toDataURL();
-    db.collection('drawings').add({
-        history: history,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+async function saveDrawing() {
+    try {
+        await addDoc(collection(db, 'drawings'), {
+            history: history,
+            createdAt: new Date()
+        });
         alert('Drawing saved');
-    }).catch((error) => {
+    } catch (error) {
         console.error('Error saving drawing: ', error);
-    });
+    }
 }
 
 // 加载数据库中的绘制内容
 async function loadDrawings() {
-    const snapshot = await db.collection('drawings').orderBy('createdAt', 'asc').get();
-    snapshot.forEach(doc => {
+    const q = query(collection(db, 'drawings'), orderBy('createdAt', 'asc'));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
         drawingHistory.forEach(path => {
             context.beginPath();
             path.forEach((point, index) => {
                 if (index === 0) {
                     context.moveTo(point.x, point.y);
-                } else {
-                    context.lineTo(point.x, point.y);
-                }
-            });
-            context.stroke();
-        });
-    });
-}
-
-window.onload = loadDrawings;
+                } 
 
