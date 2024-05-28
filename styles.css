@@ -3,6 +3,7 @@ body, html {
     padding: 0;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: #f0f0f0;
@@ -33,4 +34,16 @@ body, html {
     transform: translate(-50%, -50%);
     width: auto;
     height: 80vh; /* 固定高度 */
+}
+
+#save-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
