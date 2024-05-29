@@ -5,6 +5,7 @@ let currentPath = [];
 let history = [];
 let isTextMode = false;
 let currentColor = '#000000';
+let textInputPosition = { x: 0, y: 0 };
 
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
@@ -58,24 +59,29 @@ document.getElementById('color-picker').addEventListener('input', (event) => {
 });
 document.getElementById('toggle-mode').addEventListener('click', () => {
     isTextMode = !isTextMode;
-    document.getElementById('text-input').style.display = isTextMode ? 'block' : 'none';
+    document.getElementById('text-input-dialog').style.display = isTextMode ? 'block' : 'none';
     canvas.style.cursor = isTextMode ? 'text' : 'crosshair';
 });
 
 canvas.addEventListener('click', (event) => {
     if (!isTextMode) return;
+    const rect = canvas.getBoundingClientRect();
+    textInputPosition.x = event.clientX - rect.left;
+    textInputPosition.y = event.clientY - rect.top;
+    document.getElementById('text-input-dialog').style.display = 'block';
+});
+
+document.getElementById('text-confirm-button').addEventListener('click', () => {
     const text = document.getElementById('text-input').value;
     if (!text) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
     context.fillStyle = currentColor;
     context.font = '20px Arial';
-    context.fillText(text, x, y);
+    context.fillText(text, textInputPosition.x, textInputPosition.y);
 
-    history.push([{ x, y, text, color: currentColor, type: 'text' }]);
+    history.push([{ x: textInputPosition.x, y: textInputPosition.y, text, color: currentColor, type: 'text' }]);
+    document.getElementById('text-input').value = '';
+    document.getElementById('text-input-dialog').style.display = 'none';
 });
 
 async function saveDrawing() {
@@ -136,3 +142,4 @@ async function loadDrawings() {
 }
 
 window.onload = loadDrawings;
+
