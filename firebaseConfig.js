@@ -1,12 +1,17 @@
-// Initialize Firebase
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
+apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
   authDomain: "interactive-poster-dad2f.firebaseapp.com",
   projectId: "interactive-poster-dad2f",
   storageBucket: "interactive-poster-dad2f.appspot.com",
   messagingSenderId: "759472690939",
-  appId: "1:759472690939:web:ad38fb62a9f1908a08025e"
+  appId: "1:759472690939:web:c837fba2dbad00a208025e"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
