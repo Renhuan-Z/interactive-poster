@@ -9,15 +9,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
         }
         .poster {
             position: relative;
             margin: 10px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .poster img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .poster.active {
+            transform: scale(1.5);
         }
         #drawing-canvas {
             position: absolute;
             top: 0;
             left: 0;
+            pointer-events: none; /* Prevent pointer events on canvas */
         }
         #controls {
             position: fixed;
@@ -47,7 +59,7 @@
         <div id="upcoming-poster" class="poster">
             <img src="" alt="Upcoming Poster">
         </div>
-        <div id="current-poster" class="poster">
+        <div id="current-poster" class="poster" onclick="togglePosterSize(this)">
             <img id="background-image" src="background.jpg" alt="Current Poster">
             <canvas id="drawing-canvas"></canvas>
         </div>
@@ -71,3 +83,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
