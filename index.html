@@ -4,26 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Poster</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script defer src="firebaseConfig.js"></script>
-    <script defer src="script.js"></script>
+    <style>
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .poster {
+            margin: 10px;
+        }
+        #current-poster {
+            width: 60%;
+        }
+        #side-posters {
+            display: flex;
+            flex-direction: column;
+        }
+        .side-poster {
+            width: 20%;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <div id="canvas-container">
-        <img id="background-image" src="background.jpg" alt="Background Image">
-        <canvas id="drawing-canvas"></canvas>
+    <div id="container">
+        <div id="side-posters" class="poster">
+            <img id="ended-poster" class="side-poster" src="" alt="Ended Poster">
+            <img id="upcoming-poster" class="side-poster" src="" alt="Upcoming Poster">
+        </div>
+        <div id="current-poster" class="poster">
+            <img id="background-image" src="" alt="Current Poster">
+            <canvas id="drawing-canvas"></canvas>
+        </div>
     </div>
-    <div id="controls">
-        <input type="color" id="color-picker" value="#000000">
-        <input type="range" id="brush-size" min="1" max="20" value="5">
-        <button id="toggle-mode">Toggle Text Mode</button>
-        <button id="save-button">Save</button>
-    </div>
-    <div id="text-input-dialog" style="display:none;">
-        <textarea id="text-input" placeholder="Enter text"></textarea>
-        <button id="text-confirm-button">Confirm</button>
-    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="firebaseConfig.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
