@@ -80,7 +80,7 @@ document.getElementById('text-confirm-button').addEventListener('click', () => {
     if (!text) return;
 
     context.fillStyle = currentColor;
-    context.font = '15px Arial'; // 缩小字体到15px
+    context.font = '8px Arial'; // 缩小字体到8px
     context.fillText(text, textInputPosition.x, textInputPosition.y);
 
     history.push([{ x: textInputPosition.x, y: textInputPosition.y, text, color: currentColor, type: 'text' }]);
@@ -129,7 +129,7 @@ async function loadDrawings() {
             path.forEach((point, index) => {
                 if (point.type === 'text') {
                     context.fillStyle = point.color;
-                    context.font = '15px Arial'; // 确保加载时字体也为15px
+                    context.font = '12px Arial'; // 确保加载时字体也为12px
                     context.fillText(point.text, point.x, point.y);
                 } else {
                     context.strokeStyle = point.color;
