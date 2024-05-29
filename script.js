@@ -53,7 +53,7 @@ function draw(event) {
 }
 
 document.getElementById('save-button').addEventListener('click', saveDrawing);
-document.getElementById('color-picker').addEventListener('change', (event) => {
+document.getElementById('color-picker').addEventListener('input', (event) => {
     currentColor = event.target.value;
 });
 document.getElementById('toggle-mode').addEventListener('click', () => {
