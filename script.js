@@ -5,6 +5,7 @@ let currentPath = [];
 let history = [];
 let isTextMode = false;
 let currentColor = '#000000';
+let currentBrushSize = 5;
 let textInputPosition = { x: 0, y: 0 };
 
 // 调整canvas的尺寸以匹配背景图像
@@ -37,7 +38,7 @@ canvas.addEventListener('mousemove', draw);
 
 function draw(event) {
     if (!drawing || isTextMode) return;
-    context.lineWidth = 5;
+    context.lineWidth = currentBrushSize;
     context.lineCap = 'round';
     context.strokeStyle = currentColor;
 
@@ -50,12 +51,15 @@ function draw(event) {
     context.beginPath();
     context.moveTo(x, y);
 
-    currentPath.push({ x, y, color: currentColor });
+    currentPath.push({ x, y, color: currentColor, size: currentBrushSize });
 }
 
 document.getElementById('save-button').addEventListener('click', saveDrawing);
 document.getElementById('color-picker').addEventListener('input', (event) => {
     currentColor = event.target.value;
+});
+document.getElementById('brush-size').addEventListener('input', (event) => {
+    currentBrushSize = event.target.value;
 });
 document.getElementById('toggle-mode').addEventListener('click', () => {
     isTextMode = !isTextMode;
@@ -76,7 +80,7 @@ document.getElementById('text-confirm-button').addEventListener('click', () => {
     if (!text) return;
 
     context.fillStyle = currentColor;
-    context.font = '20px Arial';
+    context.font = '15px Arial'; // 缩小字体到15px
     context.fillText(text, textInputPosition.x, textInputPosition.y);
 
     history.push([{ x: textInputPosition.x, y: textInputPosition.y, text, color: currentColor, type: 'text' }]);
@@ -125,21 +129,12 @@ async function loadDrawings() {
             path.forEach((point, index) => {
                 if (point.type === 'text') {
                     context.fillStyle = point.color;
-                    context.font = '20px Arial';
+                    context.font = '15px Arial'; // 确保加载时字体也为15px
                     context.fillText(point.text, point.x, point.y);
                 } else {
                     context.strokeStyle = point.color;
+                    context.lineWidth = point.size;
                     if (index === 0) {
                         context.moveTo(point.x, point.y);
                     } else {
-                        context.lineTo(point.x, point.y);
-                    }
-                }
-            });
-            context.stroke();
-        });
-    });
-}
-
-window.onload = loadDrawings;
-
+                        context.lineTo(point.x, point.y
