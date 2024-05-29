@@ -58,8 +58,32 @@ body, html {
     cursor: pointer;
 }
 
+#text-input-dialog {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
 #text-input {
+    width: 200px;
+    height: 100px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+#text-confirm-button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
