@@ -3,6 +3,8 @@ const context = canvas.getContext('2d');
 let drawing = false;
 let currentPath = [];
 let history = [];
+let isTextMode = false;
+let currentColor = '#000000';
 
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
@@ -18,6 +20,7 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 canvas.addEventListener('mousedown', (event) => {
+    if (isTextMode) return;
     drawing = true;
     currentPath = [];
     history.push(currentPath);
@@ -32,10 +35,10 @@ canvas.addEventListener('mouseup', () => {
 canvas.addEventListener('mousemove', draw);
 
 function draw(event) {
-    if (!drawing) return;
+    if (!drawing || isTextMode) return;
     context.lineWidth = 5;
     context.lineCap = 'round';
-    context.strokeStyle = '#000';
+    context.strokeStyle = currentColor;
 
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -46,16 +49,39 @@ function draw(event) {
     context.beginPath();
     context.moveTo(x, y);
 
-    currentPath.push({ x, y });
+    currentPath.push({ x, y, color: currentColor });
 }
 
 document.getElementById('save-button').addEventListener('click', saveDrawing);
+document.getElementById('color-picker').addEventListener('change', (event) => {
+    currentColor = event.target.value;
+});
+document.getElementById('toggle-mode').addEventListener('click', () => {
+    isTextMode = !isTextMode;
+    document.getElementById('text-input').style.display = isTextMode ? 'block' : 'none';
+    canvas.style.cursor = isTextMode ? 'text' : 'crosshair';
+});
+
+canvas.addEventListener('click', (event) => {
+    if (!isTextMode) return;
+    const text = document.getElementById('text-input').value;
+    if (!text) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    context.fillStyle = currentColor;
+    context.font = '20px Arial';
+    context.fillText(text, x, y);
+
+    history.push([{ x, y, text, color: currentColor, type: 'text' }]);
+});
 
 async function saveDrawing() {
     const flatHistory = history.reduce((acc, path, index) => {
         const flatPath = path.map(point => ({
-            x: point.x,
-            y: point.y,
+            ...point,
             pathIndex: index
         }));
         return acc.concat(flatPath);
@@ -84,17 +110,24 @@ async function loadDrawings() {
             if (!acc[point.pathIndex]) {
                 acc[point.pathIndex] = [];
             }
-            acc[point.pathIndex].push({ x: point.x, y: point.y });
+            acc[point.pathIndex].push(point);
             return acc;
         }, {});
 
         Object.values(paths).forEach(path => {
             context.beginPath();
             path.forEach((point, index) => {
-                if (index === 0) {
-                    context.moveTo(point.x, point.y);
+                if (point.type === 'text') {
+                    context.fillStyle = point.color;
+                    context.font = '20px Arial';
+                    context.fillText(point.text, point.x, point.y);
                 } else {
-                    context.lineTo(point.x, point.y);
+                    context.strokeStyle = point.color;
+                    if (index === 0) {
+                        context.moveTo(point.x, point.y);
+                    } else {
+                        context.lineTo(point.x, point.y);
+                    }
                 }
             });
             context.stroke();
