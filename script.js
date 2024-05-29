@@ -50,10 +50,10 @@ function displayPosters(posters) {
 
   // 显示已结束和未开始的海报
   if (endedPosters.length > 0) {
-    document.getElementById('ended-poster').src = endedPosters[0].backgroundImageUrl;
+    document.getElementById('ended-poster').querySelector('img').src = endedPosters[0].backgroundImageUrl;
   }
   if (upcomingPosters.length > 0) {
-    document.getElementById('upcoming-poster').src = upcomingPosters[0].backgroundImageUrl;
+    document.getElementById('upcoming-poster').querySelector('img').src = upcomingPosters[0].backgroundImageUrl;
   }
 }
 
@@ -225,3 +225,9 @@ async function loadDrawings() {
 }
 
 window.onload = loadDrawings;
+
+// 添加海报缩放功能
+function togglePosterSize(element) {
+  element.classList.toggle('active');
+  resizeCanvas();
+}
