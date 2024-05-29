@@ -11,32 +11,60 @@
             align-items: center;
         }
         .poster {
+            position: relative;
             margin: 10px;
         }
-        #current-poster {
-            width: 60%;
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
-        #side-posters {
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            flex-direction: column;
+            gap: 10px;
         }
-        .side-poster {
-            width: 20%;
-            margin: 5px 0;
+        #text-input-dialog {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border: 1px solid black;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <div id="side-posters" class="poster">
-            <img id="ended-poster" class="side-poster" src="" alt="Ended Poster">
-            <img id="upcoming-poster" class="side-poster" src="" alt="Upcoming Poster">
+        <div id="ended-poster" class="poster">
+            <img src="" alt="Ended Poster">
+        </div>
+        <div id="upcoming-poster" class="poster">
+            <img src="" alt="Upcoming Poster">
         </div>
         <div id="current-poster" class="poster">
-            <img id="background-image" src="" alt="Current Poster">
+            <img id="background-image" src="background.jpg" alt="Current Poster">
             <canvas id="drawing-canvas"></canvas>
         </div>
     </div>
+
+    <div id="controls">
+        <input type="color" id="color-picker">
+        <input type="range" id="brush-size" min="1" max="50" value="5">
+        <button id="toggle-mode">Toggle Mode</button>
+        <button id="save-button">Save</button>
+    </div>
+
+    <div id="text-input-dialog">
+        <input type="text" id="text-input">
+        <button id="text-confirm-button">Confirm</button>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script src="firebaseConfig.js"></script>
