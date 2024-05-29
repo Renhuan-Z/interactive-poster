@@ -34,6 +34,9 @@ async function clearCanvasAndDatabase() {
     console.log('Canvas and database cleared');
 }
 
+// 确保 clearCanvasAndDatabase 函数在全局作用域中
+window.clearCanvasAndDatabase = clearCanvasAndDatabase;
+
 // 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
