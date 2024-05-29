@@ -17,6 +17,23 @@ function resizeCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+// 清空画布和数据库函数
+async function clearCanvasAndDatabase() {
+    // 清空画布
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    history = [];
+    resizeCanvas(); // 重新填充背景
+
+    // 删除数据库中的数据
+    const q = db.collection('drawings');
+    const querySnapshot = await q.get();
+    querySnapshot.forEach((doc) => {
+        doc.ref.delete();
+    });
+
+    console.log('Canvas and database cleared');
+}
+
 // 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
@@ -80,7 +97,7 @@ document.getElementById('text-confirm-button').addEventListener('click', () => {
     if (!text) return;
 
     context.fillStyle = currentColor;
-    context.font = '8px Arial'; // 缩小字体到8px
+    context.font = '12px Arial'; // 缩小字体到12px
     context.fillText(text, textInputPosition.x, textInputPosition.y);
 
     history.push([{ x: textInputPosition.x, y: textInputPosition.y, text, color: currentColor, type: 'text' }]);
