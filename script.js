@@ -1,3 +1,5 @@
+// script.js
+
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -137,4 +139,13 @@ async function loadDrawings() {
                     if (index === 0) {
                         context.moveTo(point.x, point.y);
                     } else {
-                        context.lineTo(point.x, point.y
+                        context.lineTo(point.x, point.y);
+                    }
+                }
+            });
+            context.stroke();
+        });
+    });
+}
+
+window.onload = loadDrawings;
