@@ -49,6 +49,10 @@ body, html {
     width: 100px;
 }
 
+#brush-size {
+    width: 100px;
+}
+
 #save-button, #toggle-mode {
     padding: 10px 20px;
     background-color: #007BFF;
