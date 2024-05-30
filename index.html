@@ -3,41 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Poster</title>
+    <title>Poster Gallery</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="poster-container">
-        <div id="ended-posters" class="poster-group">
-            <h2>Ended Posters</h2>
+    <div class="container">
+        <div class="posters">
+            <div class="poster ended" id="poster-ended">
+                <img src="your-ended-poster-url.jpg" alt="Ended Poster">
+                <p>22/05</p>
+            </div>
+            <div class="poster ended" id="poster-ended2">
+                <img src="your-ended-poster-url2.jpg" alt="Ended Poster 2">
+                <p>29/05</p>
+            </div>
+            <div class="poster current" id="poster-current">
+                <img src="background.jpg" alt="Current Poster">
+                <p>NOW</p>
+            </div>
+            <div class="poster upcoming" id="poster-upcoming">
+                <img src="background2.jpg" alt="Upcoming Poster">
+                <p>07/06</p>
+            </div>
+            <div class="poster upcoming" id="poster-upcoming2">
+                <img src="your-upcoming-poster-url2.jpg" alt="Upcoming Poster 2">
+                <p>15/06</p>
+            </div>
         </div>
-        <div id="current-poster" class="poster-group">
-            <h2>Current Poster</h2>
-            <img id="background-image" src="" alt="Current Poster">
+        <div class="controls">
+            <button id="prevBtn">◀</button>
+            <button id="nextBtn">▶</button>
         </div>
-        <div id="upcoming-posters" class="poster-group">
-            <h2>Upcoming Posters</h2>
-        </div>
-    </div>
-    <div id="drawing-controls" style="display: none;">
-        <button id="toggle-mode">Toggle Mode</button>
-        <input type="color" id="color-picker">
-        <input type="range" id="brush-size" min="1" max="50" value="5">
-        <button id="save-button">Save</button>
-    </div>
-    <canvas id="drawing-canvas"></canvas>
-    <div id="text-input-dialog" style="display: none;">
-        <input type="text" id="text-input">
-        <button id="text-confirm-button">Confirm</button>
     </div>
 
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <!-- Firebase Config -->
-    <script src="firebaseConfig.js"></script>
-    <!-- Main Script -->
     <script src="script.js"></script>
 </body>
 </html>
