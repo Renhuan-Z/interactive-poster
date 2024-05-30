@@ -146,4 +146,3 @@ document.getElementById('color-picker').addEventListener('input', (event) => {
 document.getElementById('brush-size').addEventListener('input', (event) => {
     currentBrushSize = event.target.value;
 });
-
