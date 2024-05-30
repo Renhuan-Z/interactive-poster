@@ -1,93 +1,48 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
+body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
 }
 
-#canvas-container {
+#ended-posters, #current-poster, #upcoming-posters {
+    margin-bottom: 20px;
+}
+
+#ended-posters img, #current-poster img, #upcoming-posters img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+#current-poster {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 80vh;
 }
 
 #drawing-canvas {
-    background: rgba(255, 255, 255, 0.1); /* 10% 透明度的白色覆盖层 */
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 1px solid #ccc;
-}
-
-#background-image {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
 }
 
-#controls {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#color-picker {
-    width: 100px;
-}
-
-#brush-size {
-    width: 100px;
-}
-
-#save-button, #toggle-mode {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 #text-input-dialog {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: white;
-    border: 1px solid #ccc;
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
     padding: 10px;
-    border-radius: 5px;
+    border: 1px solid black;
+    z-index: 10;
 }
 
-#text-input {
-    width: 200px;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+button, input[type="color"], input[type="range"] {
+    margin: 5px;
 }
 
-#text-confirm-button {
-    padding: 10px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
