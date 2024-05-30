@@ -1,3 +1,18 @@
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
+  authDomain: "interactive-poster-dad2f.firebaseapp.com",
+  projectId: "interactive-poster-dad2f",
+  storageBucket: "interactive-poster-dad2f.appspot.com",
+  messagingSenderId: "759472690939",
+  appId: "1:759472690939:web:c837fba2dbad00a208025e"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -17,54 +32,29 @@ function resizeCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-// 获取海报列表
-async function getPosters() {
-    const querySnapshot = await db.collection('posters').get();
-    const posters = [];
+// 清空画布和数据库函数
+async function clearCanvasAndDatabase() {
+    // 清空画布
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    history = [];
+    resizeCanvas(); // 重新填充背景
+
+    // 删除数据库中的数据
+    const q = db.collection('drawings');
+    const querySnapshot = await q.get();
     querySnapshot.forEach((doc) => {
-        posters.push({ id: doc.id, ...doc.data() });
+        doc.ref.delete();
     });
-    return posters;
+
+    console.log('Canvas and database cleared');
 }
 
-// 初始化函数
-async function init() {
-    const posters = await getPosters();
+// 确保 clearCanvasAndDatabase 函数在全局作用域中
+window.clearCanvasAndDatabase = clearCanvasAndDatabase;
 
-    // 获取并显示当前海报
-    const currentPoster = posters.find(poster => poster.status === 'current');
-    if (currentPoster) {
-        const backgroundImage = document.getElementById('background-image');
-        backgroundImage.src = currentPoster.backgroundImageUrl;
-        backgroundImage.onload = resizeCanvas;
-    }
-
-    // 显示已结束的海报
-    const endedPostersList = document.getElementById('ended-posters-list');
-    const endedPosters = posters.filter(poster => poster.status === 'ended');
-    endedPosters.forEach(poster => {
-        const img = document.createElement('img');
-        img.src = poster.backgroundImageUrl;
-        img.alt = 'Ended Poster';
-        img.className = 'poster';
-        endedPostersList.appendChild(img);
-    });
-
-    // 显示即将开始的海报
-    const upcomingPostersList = document.getElementById('upcoming-posters-list');
-    const upcomingPosters = posters.filter(poster => poster.status === 'upcoming');
-    upcomingPosters.forEach(poster => {
-        const img = document.createElement('img');
-        img.src = poster.backgroundImageUrl;
-        img.alt = 'Upcoming Poster';
-        img.className = 'poster';
-        upcomingPostersList.appendChild(img);
-    });
-
-    loadDrawings();
-}
-
+// 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 canvas.addEventListener('mousedown', (event) => {
     if (isTextMode) return;
@@ -189,6 +179,38 @@ async function loadDrawings() {
             context.stroke();
         });
     });
+}
+
+async function loadPosters() {
+    const q = db.collection('posters').orderBy('startTime', 'asc');
+    const querySnapshot = await q.get();
+    const endedPosters = document.getElementById('ended-posters');
+    const currentPoster = document.getElementById('current-poster');
+    const upcomingPosters = document.getElementById('upcoming-posters');
+
+    querySnapshot.forEach((doc) => {
+        const poster = doc.data();
+        const img = document.createElement('img');
+        img.src = poster.backgroundImageUrl;
+        img.alt = poster.id;
+
+        if (poster.status === 'ended') {
+            endedPosters.appendChild(img);
+        } else if (poster.status === 'current') {
+            currentPoster.innerHTML = '';
+            currentPoster.appendChild(img);
+            currentPoster.style.display = 'block';
+            img.id = 'background-image';
+            resizeCanvas();
+            loadDrawings();
+        } else if (poster.status === 'upcoming') {
+            upcomingPosters.appendChild(img);
+        }
+    });
+}
+
+function init() {
+    loadPosters();
 }
 
 window.onload = init;
