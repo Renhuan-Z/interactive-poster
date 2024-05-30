@@ -17,29 +17,54 @@ function resizeCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-// 清空画布和数据库函数
-async function clearCanvasAndDatabase() {
-    // 清空画布
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    history = [];
-    resizeCanvas(); // 重新填充背景
-
-    // 删除数据库中的数据
-    const q = db.collection('drawings');
-    const querySnapshot = await q.get();
+// 获取海报列表
+async function getPosters() {
+    const querySnapshot = await db.collection('posters').get();
+    const posters = [];
     querySnapshot.forEach((doc) => {
-        doc.ref.delete();
+        posters.push({ id: doc.id, ...doc.data() });
     });
-
-    console.log('Canvas and database cleared');
+    return posters;
 }
 
-// 确保 clearCanvasAndDatabase 函数在全局作用域中
-window.clearCanvasAndDatabase = clearCanvasAndDatabase;
+// 初始化函数
+async function init() {
+    const posters = await getPosters();
 
-// 监听窗口调整大小事件，调整canvas尺寸
+    // 获取并显示当前海报
+    const currentPoster = posters.find(poster => poster.status === 'current');
+    if (currentPoster) {
+        const backgroundImage = document.getElementById('background-image');
+        backgroundImage.src = currentPoster.backgroundImageUrl;
+        backgroundImage.onload = resizeCanvas;
+    }
+
+    // 显示已结束的海报
+    const endedPostersList = document.getElementById('ended-posters-list');
+    const endedPosters = posters.filter(poster => poster.status === 'ended');
+    endedPosters.forEach(poster => {
+        const img = document.createElement('img');
+        img.src = poster.backgroundImageUrl;
+        img.alt = 'Ended Poster';
+        img.className = 'poster';
+        endedPostersList.appendChild(img);
+    });
+
+    // 显示即将开始的海报
+    const upcomingPostersList = document.getElementById('upcoming-posters-list');
+    const upcomingPosters = posters.filter(poster => poster.status === 'upcoming');
+    upcomingPosters.forEach(poster => {
+        const img = document.createElement('img');
+        img.src = poster.backgroundImageUrl;
+        img.alt = 'Upcoming Poster';
+        img.className = 'poster';
+        upcomingPostersList.appendChild(img);
+    });
+
+    loadDrawings();
+}
+
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 canvas.addEventListener('mousedown', (event) => {
     if (isTextMode) return;
@@ -129,7 +154,6 @@ async function saveDrawing() {
     }
 }
 
-
 async function loadDrawings() {
     const q = db.collection('drawings').orderBy('createdAt', 'asc');
     const querySnapshot = await q.get();
@@ -167,5 +191,4 @@ async function loadDrawings() {
     });
 }
 
-
-window.onload = loadDrawings;
+window.onload = init;
