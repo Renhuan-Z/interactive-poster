@@ -113,36 +113,11 @@ async function loadDrawings() {
 function enterDrawingMode() {
     const drawingControls = document.getElementById('drawing-controls');
     drawingControls.style.display = 'block';
+    canvas.style.display = 'block';
+    resizeCanvas();
     loadDrawings();
 }
 
-window.onload = getPosters;
-
-document.getElementById('save-button').addEventListener('click', async () => {
-    const flatHistory = history.reduce((acc, path, index) => {
-        const flatPath = path.map(point => ({
-            ...point,
-            pathIndex: index
-        }));
-        return acc.concat(flatPath);
-    }, []);
-
-    try {
-        await db.collection('drawings').add({
-            history: flatHistory,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert('Drawing saved');
-        console.log('Drawing saved:', flatHistory);
-    } catch (error) {
-        console.error('Error saving drawing:', error);
-    }
-});
-
-document.getElementById('color-picker').addEventListener('input', (event) => {
-    currentColor = event.target.value;
-});
-
-document.getElementById('brush-size').addEventListener('input', (event) => {
-    currentBrushSize = event.target.value;
-});
+window.onload = async () => {
+    await getPosters();
+};
