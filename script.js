@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
             canvas.width = img.width;
             canvas.height = img.height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings();
+            loadDrawings(); // 确保在图像加载后调用
         };
 
         let drawing = false;
@@ -95,6 +95,46 @@ document.addEventListener("DOMContentLoaded", function () {
         let currentBrushSize = 5;
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
+
+        async function loadDrawings() {
+            try {
+                const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
+                const paths = {};
+
+                snapshot.forEach(doc => {
+                    const point = doc.data();
+                    if (!paths[point.pathIndex]) {
+                        paths[point.pathIndex] = [];
+                    }
+                    paths[point.pathIndex].push(point);
+                });
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
+
+                Object.values(paths).forEach(path => {
+                    context.beginPath();
+                    path.forEach((point, index) => {
+                        if (point.type === 'text') {
+                            context.fillStyle = point.color;
+                            context.font = '12px Arial';
+                            context.fillText(point.text, point.x, point.y);
+                        } else {
+                            context.strokeStyle = point.color;
+                            context.lineWidth = point.size;
+                            if (index === 0) {
+                                context.moveTo(point.x, point.y);
+                            } else {
+                                context.lineTo(point.x, point.y);
+                            }
+                        }
+                    });
+                    context.stroke();
+                });
+            } catch (error) {
+                console.error('Error loading drawings:', error);
+            }
+        }
 
         function draw(event) {
             if (!drawing || isTextMode) return;
@@ -142,46 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Error saving drawing:', error);
             }
         });
-
-        async function loadDrawings() {
-            try {
-                const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-                const paths = {};
-
-                snapshot.forEach(doc => {
-                    const point = doc.data();
-                    if (!paths[point.pathIndex]) {
-                        paths[point.pathIndex] = [];
-                    }
-                    paths[point.pathIndex].push(point);
-                });
-
-                context.clearRect(0, 0, canvas.width, canvas.height);
-                context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
-
-                Object.values(paths).forEach(path => {
-                    context.beginPath();
-                    path.forEach((point, index) => {
-                        if (point.type === 'text') {
-                            context.fillStyle = point.color;
-                            context.font = '12px Arial';
-                            context.fillText(point.text, point.x, point.y);
-                        } else {
-                            context.strokeStyle = point.color;
-                            context.lineWidth = point.size;
-                            if (index === 0) {
-                                context.moveTo(point.x, point.y);
-                            } else {
-                                context.lineTo(point.x, point.y);
-                            }
-                        }
-                    });
-                    context.stroke();
-                });
-            } catch (error) {
-                console.error('Error loading drawings:', error);
-            }
-        }
 
         function resizeCanvas() {
             canvas.width = img.width;
