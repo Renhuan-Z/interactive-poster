@@ -1,17 +1,12 @@
-// firebaseConfig.js
-
-// Your web app's Firebase configuration
-var firebaseConfig = {
-  apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
-  authDomain: "interactive-poster-dad2f.firebaseapp.com",
-  projectId: "interactive-poster-dad2f",
-  storageBucket: "interactive-poster-dad2f.appspot.com",
-  messagingSenderId: "759472690939",
-  appId: "1:759472690939:web:ad38fb62a9f1908a08025e"
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
-// 初始化 Firebase
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
-// 初始化 Firestore
-var db = firebase.firestore();
+const db = firebase.firestore();
