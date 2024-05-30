@@ -1,3 +1,49 @@
+// 初始化海报数据
+const postersData = [
+    {
+        id: 'poster-ended',
+        url: 'your-ended-poster-url.jpg',
+        date: '22/05',
+        status: 'ended'
+    },
+    {
+        id: 'poster-ended2',
+        url: 'your-ended-poster-url2.jpg',
+        date: '29/05',
+        status: 'ended'
+    },
+    {
+        id: 'poster-current',
+        url: 'background.jpg',
+        date: 'NOW',
+        status: 'current'
+    },
+    {
+        id: 'poster-upcoming',
+        url: 'background2.jpg',
+        date: '07/06',
+        status: 'upcoming'
+    },
+    {
+        id: 'poster-upcoming2',
+        url: 'your-upcoming-poster-url2.jpg',
+        date: '15/06',
+        status: 'upcoming'
+    }
+];
+
+// 设置海报图片和日期
+postersData.forEach(poster => {
+    const posterElement = document.getElementById(poster.id);
+    const imgElement = posterElement.querySelector('img');
+    imgElement.src = poster.url;
+    posterElement.querySelector('p').innerText = poster.date;
+    imgElement.onerror = function() {
+        posterElement.style.display = 'none';
+    };
+});
+
+// 切换海报
 document.getElementById('prevBtn').addEventListener('click', function() {
     shiftPosters(-1);
 });
@@ -138,4 +184,3 @@ async function loadDrawings() {
         });
     });
 }
-
