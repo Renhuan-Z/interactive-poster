@@ -2,20 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Poster</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="ended-posters">Ended Posters</div>
-    <div id="current-poster">
-        <img id="background-image" style="display: none;">
-        <canvas id="drawing-canvas"></canvas>
+    <div class="container">
+        <div class="poster" id="ended-posters">
+            <h2>Ended Posters</h2>
+        </div>
+        <div class="poster" id="current-poster">
+            <h2>Current Poster</h2>
+            <img id="background-image" src="your-background-image.jpg" alt="Current Poster">
+            <canvas id="drawing-canvas"></canvas>
+        </div>
+        <div class="poster" id="upcoming-posters">
+            <h2>Upcoming Posters</h2>
+        </div>
     </div>
-    <div id="upcoming-posters">Upcoming Posters</div>
-    <div>
+    <div class="controls">
         <button id="toggle-mode">Toggle Mode</button>
-        <input type="color" id="color-picker">
+        <input type="color" id="color-picker" value="#000000">
         <input type="range" id="brush-size" min="1" max="20" value="5">
         <button id="save-button">Save</button>
     </div>
@@ -23,9 +29,8 @@
         <input type="text" id="text-input">
         <button id="text-confirm-button">Confirm</button>
     </div>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="firebaseConfig.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
+
