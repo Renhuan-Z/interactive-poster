@@ -56,14 +56,14 @@ async function getPosters() {
         const img = document.createElement('img');
         img.src = poster.backgroundImageUrl;
         img.alt = poster.id;
+        img.classList.add('poster-image');
         console.log('Image URL:', poster.backgroundImageUrl); // 添加日志输出
 
         if (poster.status === 'current') {
             const currentPosterDiv = document.getElementById('current-poster');
             const backgroundImage = document.getElementById('background-image');
             backgroundImage.src = poster.backgroundImageUrl;
-            currentPosterDiv.appendChild(img);
-            img.addEventListener('click', enterDrawingMode);
+            backgroundImage.addEventListener('click', enterDrawingMode);
         } else if (poster.status === 'ended') {
             const endedPostersDiv = document.getElementById('ended-posters');
             endedPostersDiv.appendChild(img);
@@ -117,3 +117,32 @@ function enterDrawingMode() {
 }
 
 window.onload = getPosters;
+
+document.getElementById('save-button').addEventListener('click', async () => {
+    const flatHistory = history.reduce((acc, path, index) => {
+        const flatPath = path.map(point => ({
+            ...point,
+            pathIndex: index
+        }));
+        return acc.concat(flatPath);
+    }, []);
+
+    try {
+        await db.collection('drawings').add({
+            history: flatHistory,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Drawing saved');
+        console.log('Drawing saved:', flatHistory);
+    } catch (error) {
+        console.error('Error saving drawing:', error);
+    }
+});
+
+document.getElementById('color-picker').addEventListener('input', (event) => {
+    currentColor = event.target.value;
+});
+
+document.getElementById('brush-size').addEventListener('input', (event) => {
+    currentBrushSize = event.target.value;
+});
