@@ -11,11 +11,25 @@ document.addEventListener("DOMContentLoaded", function () {
     let textInputPosition = { x: 0, y: 0 };
     const canvas = document.getElementById('drawing-canvas');
     const context = canvas.getContext('2d');
+    let postersDataCache = null; // 缓存海报数据
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
+        if (postersDataCache) {
+            return postersDataCache;
+        }
         try {
             const snapshot = await db.collection('posters').get();
+            postersDataCache = snapshot;
+            return snapshot;
+        } catch (error) {
+            console.error("Error getting posters: ", error);
+        }
+    }
+
+    async function loadPosters() {
+        try {
+            const snapshot = await getPosters();
             snapshot.forEach(doc => {
                 const data = doc.data();
                 let posterElement;
@@ -31,11 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
-            console.error("Error getting posters: ", error);
+            console.error("Error loading posters: ", error);
         }
     }
 
-    getPosters();
+    loadPosters();
 
     // 轮播功能
     document.getElementById('prev-button').addEventListener('click', () => {
