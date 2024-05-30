@@ -175,36 +175,4 @@ async function loadDrawings() {
     });
 }
 
-async function loadPosters() {
-    const q = db.collection('posters').orderBy('startTime', 'asc');
-    const querySnapshot = await q.get();
-    const endedPosters = document.getElementById('ended-posters');
-    const currentPoster = document.getElementById('current-poster');
-    const upcomingPosters = document.getElementById('upcoming-posters');
-
-    querySnapshot.forEach((doc) => {
-        const poster = doc.data();
-        const img = document.createElement('img');
-        img.src = poster.backgroundImageUrl;
-        img.alt = poster.id;
-
-        if (poster.status === 'ended') {
-            endedPosters.appendChild(img);
-        } else if (poster.status === 'current') {
-            currentPoster.innerHTML = '';
-            currentPoster.appendChild(img);
-            currentPoster.style.display = 'block';
-            img.id = 'background-image';
-            img.onload = () => resizeCanvas(); // 等待图像加载后调整canvas尺寸
-            loadDrawings();
-        } else if (poster.status === 'upcoming') {
-            upcomingPosters.appendChild(img);
-        }
-    });
-}
-
-function init() {
-    loadPosters();
-}
-
-window.onload = init;
+window.onload = loadDrawings;
