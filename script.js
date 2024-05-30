@@ -156,7 +156,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('save-button').addEventListener('click', async () => {
             try {
-                await db.collection('posters').doc(currentPosterId).collection('drawings').add({ history, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                // 扁平化历史记录以避免嵌套数组问题
+                const flatHistory = history.reduce((acc, path) => acc.concat(path), []);
+                await db.collection('posters').doc(currentPosterId).collection('drawings').add({
+                    history: flatHistory,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 alert('Drawing saved');
             } catch (error) {
                 console.error('Error saving drawing:', error);
