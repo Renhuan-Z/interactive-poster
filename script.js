@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     posterElement.dataset.posterId = doc.id;
                 }
             });
+            updateCarousel(); // 初始化海报状态
         } catch (error) {
             console.error("Error getting posters: ", error);
         }
@@ -41,8 +42,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateCarousel() {
         posters.forEach((poster, index) => {
             poster.classList.remove('current', 'left-one', 'right-one', 'left-two', 'right-two');
+            poster.style.filter = 'blur(10px)'; // 默认模糊
+
             if (index === currentIndex) {
                 poster.classList.add('current');
+                poster.style.filter = 'none'; // 当前海报清晰
             } else if (index === (currentIndex - 1 + posters.length) % posters.length) {
                 poster.classList.add('left-one');
             } else if (index === (currentIndex + 1) % posters.length) {
@@ -92,39 +96,34 @@ document.addEventListener("DOMContentLoaded", function () {
         async function loadDrawings() {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-                snapshot.forEach(doc => {
-                    const drawingHistory = doc.data().history;
-                    if (!Array.isArray(drawingHistory)) {
-                        console.error('Invalid drawing history format:', drawingHistory);
-                        return;
-                    }
-                    const paths = drawingHistory.reduce((acc, point) => {
-                        if (!acc[point.pathIndex]) {
-                            acc[point.pathIndex] = [];
-                        }
-                        acc[point.pathIndex].push(point);
-                        return acc;
-                    }, {});
+                const paths = {};
 
-                    Object.values(paths).forEach(path => {
-                        context.beginPath();
-                        path.forEach((point, index) => {
-                            if (point.type === 'text') {
-                                context.fillStyle = point.color;
-                                context.font = '12px Arial';
-                                context.fillText(point.text, point.x, point.y);
+                snapshot.forEach(doc => {
+                    const point = doc.data();
+                    if (!paths[point.pathIndex]) {
+                        paths[point.pathIndex] = [];
+                    }
+                    paths[point.pathIndex].push(point);
+                });
+
+                Object.values(paths).forEach(path => {
+                    context.beginPath();
+                    path.forEach((point, index) => {
+                        if (point.type === 'text') {
+                            context.fillStyle = point.color;
+                            context.font = '12px Arial';
+                            context.fillText(point.text, point.x, point.y);
+                        } else {
+                            context.strokeStyle = point.color;
+                            context.lineWidth = point.size;
+                            if (index === 0) {
+                                context.moveTo(point.x, point.y);
                             } else {
-                                context.strokeStyle = point.color;
-                                context.lineWidth = point.size;
-                                if (index === 0) {
-                                    context.moveTo(point.x, point.y);
-                                } else {
-                                    context.lineTo(point.x, point.y);
-                                }
+                                context.lineTo(point.x, point.y);
                             }
-                        });
-                        context.stroke();
+                        }
                     });
+                    context.stroke();
                 });
             } catch (error) {
                 console.error('Error loading drawings:', error);
@@ -160,12 +159,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('save-button').addEventListener('click', async () => {
             try {
-                // 扁平化历史记录以避免嵌套数组问题
-                const flatHistory = history.reduce((acc, path) => acc.concat(path), []);
-                await db.collection('posters').doc(currentPosterId).collection('drawings').add({
-                    history: flatHistory,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                const batch = db.batch();
+                const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
+
+                history.forEach((path, pathIndex) => {
+                    path.forEach(point => {
+                        const pointRef = drawingsRef.doc();
+                        batch.set(pointRef, { ...point, pathIndex });
+                    });
                 });
+
+                await batch.commit();
                 alert('Drawing saved');
             } catch (error) {
                 console.error('Error saving drawing:', error);
