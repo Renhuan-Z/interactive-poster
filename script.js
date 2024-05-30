@@ -181,6 +181,7 @@ async function loadDrawings() {
     });
 }
 
+
 async function loadPosters() {
     const q = db.collection('posters').orderBy('startTime', 'asc');
     const querySnapshot = await q.get();
