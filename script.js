@@ -1,3 +1,4 @@
+
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
