@@ -51,13 +51,13 @@ async function getPosters() {
     const querySnapshot = await db.collection('posters').get();
     querySnapshot.forEach((doc) => {
         const poster = doc.data();
-        console.log('Poster:', poster); // 添加日志输出
+        console.log('Poster:', poster);
 
         const img = document.createElement('img');
         img.src = poster.backgroundImageUrl;
         img.alt = poster.id;
         img.classList.add('poster-image');
-        console.log('Image URL:', poster.backgroundImageUrl); // 添加日志输出
+        console.log('Image URL:', poster.backgroundImageUrl);
 
         if (poster.status === 'current') {
             const currentPosterDiv = document.getElementById('current-poster');
