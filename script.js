@@ -1,81 +1,116 @@
+document.getElementById('prevBtn').addEventListener('click', function() {
+    shiftPosters(-1);
+});
+
+document.getElementById('nextBtn').addEventListener('click', function() {
+    shiftPosters(1);
+});
+
+function shiftPosters(direction) {
+    const posters = document.querySelectorAll('.poster');
+    posters.forEach(poster => {
+        const currentOrder = parseInt(window.getComputedStyle(poster).order);
+        let newOrder = currentOrder + direction;
+        if (newOrder > posters.length - 1) newOrder = 0;
+        if (newOrder < 0) newOrder = posters.length - 1;
+        poster.style.order = newOrder;
+    });
+}
+
+// 绘制模式相关的代码
+const currentPoster = document.getElementById('poster-current');
+const drawingMode = document.getElementById('drawing-mode');
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
 let currentPath = [];
 let history = [];
-let isTextMode = false;
 let currentColor = '#000000';
 let currentBrushSize = 5;
-let textInputPosition = { x: 0, y: 0 };
 
-function resizeCanvas() {
-    const backgroundImage = document.getElementById('background-image');
-    if (!backgroundImage) {
-        console.error('Background image element not found');
-        return;
-    }
-    canvas.width = backgroundImage.clientWidth;
-    canvas.height = backgroundImage.clientHeight;
-    context.fillStyle = "rgba(255, 255, 255, 0.1)";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+currentPoster.addEventListener('click', function() {
+    document.querySelector('.container').classList.add('hidden');
+    drawingMode.classList.remove('hidden');
+    resizeCanvas();
+    loadDrawings();
+});
+
+document.getElementById('exitDrawingMode').addEventListener('click', function() {
+    drawingMode.classList.add('hidden');
+    document.querySelector('.container').classList.remove('hidden');
+});
+
+canvas.addEventListener('mousedown', (event) => {
+    drawing = true;
+    currentPath = [];
+    history.push(currentPath);
+    draw(event);
+});
+
+canvas.addEventListener('mouseup', () => {
+    drawing = false;
+    context.beginPath();
+});
+
+canvas.addEventListener('mousemove', draw);
+
+function draw(event) {
+    if (!drawing) return;
+    context.lineWidth = currentBrushSize;
+    context.lineCap = 'round';
+    context.strokeStyle = currentColor;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    context.lineTo(x, y);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(x, y);
+
+    currentPath.push({ x, y, color: currentColor, size: currentBrushSize });
 }
 
-window.addEventListener('resize', resizeCanvas);
-
-document.getElementById('toggle-mode').addEventListener('click', () => {
-    isTextMode = !isTextMode;
-    document.getElementById('text-input-dialog').style.display = isTextMode ? 'block' : 'none';
-    canvas.style.cursor = isTextMode ? 'text' : 'crosshair';
+document.getElementById('color-picker').addEventListener('input', (event) => {
+    currentColor = event.target.value;
 });
 
-canvas.addEventListener('click', (event) => {
-    if (!isTextMode) return;
-    const rect = canvas.getBoundingClientRect();
-    textInputPosition.x = event.clientX - rect.left;
-    textInputPosition.y = event.clientY - rect.top;
-    document.getElementById('text-input-dialog').style.display = 'block';
+document.getElementById('brush-size').addEventListener('input', (event) => {
+    currentBrushSize = event.target.value;
 });
 
-document.getElementById('text-confirm-button').addEventListener('click', () => {
-    const text = document.getElementById('text-input').value;
-    if (!text) return;
-    context.fillStyle = currentColor;
-    context.font = '12px Arial';
-    context.fillText(text, textInputPosition.x, textInputPosition.y);
-    history.push([{ x: textInputPosition.x, y: textInputPosition.y, text, color: currentColor, type: 'text' }]);
-    document.getElementById('text-input').value = '';
-    document.getElementById('text-input-dialog').style.display = 'none';
-});
+document.getElementById('save-button').addEventListener('click', saveDrawing);
 
-async function getPosters() {
-    const querySnapshot = await db.collection('posters').get();
-    querySnapshot.forEach((doc) => {
-        const poster = doc.data();
-        console.log('Poster:', poster);
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.8;
+}
 
-        const img = document.createElement('img');
-        img.src = poster.backgroundImageUrl;
-        img.alt = poster.id;
-        img.classList.add('poster-image');
-        console.log('Image URL:', poster.backgroundImageUrl);
+async function saveDrawing() {
+    const flatHistory = history.reduce((acc, path, index) => {
+        const flatPath = path.map(point => ({
+            ...point,
+            pathIndex: index
+        }));
+        return acc.concat(flatPath);
+    }, []);
 
-        if (poster.status === 'current') {
-            const currentPosterDiv = document.getElementById('current-poster');
-            const backgroundImage = document.getElementById('background-image');
-            backgroundImage.src = poster.backgroundImageUrl;
-            backgroundImage.addEventListener('click', enterDrawingMode);
-        } else if (poster.status === 'ended') {
-            const endedPostersDiv = document.getElementById('ended-posters');
-            endedPostersDiv.appendChild(img);
-        } else if (poster.status === 'upcoming') {
-            const upcomingPostersDiv = document.getElementById('upcoming-posters');
-            upcomingPostersDiv.appendChild(img);
-        }
-    });
+    try {
+        await db.collection('drawings').add({
+            history: flatHistory,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Drawing saved');
+        console.log('Drawing saved:', flatHistory);
+    } catch (error) {
+        console.error('Error saving drawing:', error);
+    }
 }
 
 async function loadDrawings() {
-    const querySnapshot = await db.collection('drawings').orderBy('createdAt', 'asc').get();
+    const q = db.collection('drawings').orderBy('createdAt', 'asc');
+    const querySnapshot = await q.get();
     querySnapshot.forEach((doc) => {
         const drawingHistory = doc.data().history;
         console.log('Loaded drawing:', drawingHistory);
@@ -91,18 +126,12 @@ async function loadDrawings() {
         Object.values(paths).forEach(path => {
             context.beginPath();
             path.forEach((point, index) => {
-                if (point.type === 'text') {
-                    context.fillStyle = point.color;
-                    context.font = '12px Arial';
-                    context.fillText(point.text, point.x, point.y);
+                context.strokeStyle = point.color;
+                context.lineWidth = point.size;
+                if (index === 0) {
+                    context.moveTo(point.x, point.y);
                 } else {
-                    context.strokeStyle = point.color;
-                    context.lineWidth = point.size;
-                    if (index === 0) {
-                        context.moveTo(point.x, point.y);
-                    } else {
-                        context.lineTo(point.x, point.y);
-                    }
+                    context.lineTo(point.x, point.y);
                 }
             });
             context.stroke();
@@ -110,14 +139,3 @@ async function loadDrawings() {
     });
 }
 
-function enterDrawingMode() {
-    const drawingControls = document.getElementById('drawing-controls');
-    drawingControls.style.display = 'block';
-    canvas.style.display = 'block';
-    resizeCanvas();
-    loadDrawings();
-}
-
-window.onload = async () => {
-    await getPosters();
-};
