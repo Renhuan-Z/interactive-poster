@@ -1,3 +1,5 @@
+const db = firebase.firestore();
+
 // 初始化海报数据
 const postersData = [
     {
