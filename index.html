@@ -36,6 +36,17 @@
         </div>
     </div>
 
+    <!-- 添加绘制模式相关的元素 -->
+    <div id="drawing-mode" class="hidden">
+        <canvas id="drawing-canvas"></canvas>
+        <div class="toolbar">
+            <button id="exitDrawingMode">Exit</button>
+            <input type="color" id="color-picker">
+            <input type="range" id="brush-size" min="1" max="50" value="5">
+            <button id="save-button">Save</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
