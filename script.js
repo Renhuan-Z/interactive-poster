@@ -9,7 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const snapshot = await db.collection('posters').get();
             snapshot.forEach(doc => {
                 const data = doc.data();
-                const posterElement = document.getElementById(`${data.status}-poster-${data.id}`);
+                let posterElement;
+                if (data.id === 'poster01') {
+                    posterElement = document.getElementById('poster-3');
+                } else if (data.id === 'poster02') {
+                    posterElement = document.getElementById('poster-4');
+                }
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
                 }
@@ -34,13 +39,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateCarousel() {
         posters.forEach((poster, index) => {
-            poster.classList.remove('current', 'ended', 'upcoming');
+            poster.classList.remove('current', 'left-one', 'right-one', 'left-two', 'right-two');
             if (index === currentIndex) {
                 poster.classList.add('current');
-            } else if (index === (currentIndex - 1 + posters.length) % posters.length || index === (currentIndex + 1) % posters.length) {
-                poster.classList.add('ended');
-            } else {
-                poster.classList.add('upcoming');
+            } else if (index === (currentIndex - 1 + posters.length) % posters.length) {
+                poster.classList.add('left-one');
+            } else if (index === (currentIndex + 1) % posters.length) {
+                poster.classList.add('right-one');
+            } else if (index === (currentIndex - 2 + posters.length) % posters.length) {
+                poster.classList.add('left-two');
+            } else if (index === (currentIndex + 2) % posters.length) {
+                poster.classList.add('right-two');
             }
         });
     }
