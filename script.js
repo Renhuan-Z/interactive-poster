@@ -52,6 +52,11 @@ async function clearCanvasAndDatabase() {
 // 确保 clearCanvasAndDatabase 函数在全局作用域中
 window.clearCanvasAndDatabase = clearCanvasAndDatabase;
 
+window.onload = function() {
+    loadPosters();  // 确保先加载海报信息
+    loadDrawings(); // 然后加载绘图信息
+};
+
 // 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
@@ -209,6 +214,7 @@ async function loadPosters() {
         }
     });
 }
+
 
 function init() {
     loadPosters();
