@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 初始化轮播
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
+    let currentPosterId;
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
@@ -10,13 +10,14 @@ document.addEventListener("DOMContentLoaded", function () {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 let posterElement;
-                if (data.id === 'poster01') {
+                if (doc.id === 'poster01') {
                     posterElement = document.getElementById('poster-3');
-                } else if (data.id === 'poster02') {
+                } else if (doc.id === 'poster02') {
                     posterElement = document.getElementById('poster-4');
                 }
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
+                    posterElement.dataset.posterId = doc.id;
                 }
             });
         } catch (error) {
@@ -57,13 +58,14 @@ document.addEventListener("DOMContentLoaded", function () {
     posters.forEach(poster => {
         poster.addEventListener('click', () => {
             if (poster.classList.contains('current')) {
+                currentPosterId = poster.dataset.posterId;
                 enterDrawingMode();
             }
         });
     });
 
     // 进入绘制模式
-    function enterDrawingMode() {
+    async function enterDrawingMode() {
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
         const canvas = document.getElementById('drawing-canvas');
@@ -84,6 +86,45 @@ document.addEventListener("DOMContentLoaded", function () {
             canvas.height = window.innerHeight;
             context.fillStyle = "rgba(255, 255, 255, 0.1)";
             context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // 加载绘制记录
+        async function loadDrawings() {
+            try {
+                const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
+                snapshot.forEach(doc => {
+                    const drawingHistory = doc.data().history;
+                    const paths = drawingHistory.reduce((acc, point) => {
+                        if (!acc[point.pathIndex]) {
+                            acc[point.pathIndex] = [];
+                        }
+                        acc[point.pathIndex].push(point);
+                        return acc;
+                    }, {});
+
+                    Object.values(paths).forEach(path => {
+                        context.beginPath();
+                        path.forEach((point, index) => {
+                            if (point.type === 'text') {
+                                context.fillStyle = point.color;
+                                context.font = '12px Arial';
+                                context.fillText(point.text, point.x, point.y);
+                            } else {
+                                context.strokeStyle = point.color;
+                                context.lineWidth = point.size;
+                                if (index === 0) {
+                                    context.moveTo(point.x, point.y);
+                                } else {
+                                    context.lineTo(point.x, point.y);
+                                }
+                            }
+                        });
+                        context.stroke();
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading drawings:', error);
+            }
         }
 
         function draw(event) {
@@ -115,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('save-button').addEventListener('click', async () => {
             try {
-                await db.collection('drawings').add({ history, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                await db.collection('posters').doc(currentPosterId).collection('drawings').add({ history, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
                 alert('Drawing saved');
             } catch (error) {
                 console.error('Error saving drawing:', error);
@@ -124,5 +165,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        await loadDrawings();
     }
 });
