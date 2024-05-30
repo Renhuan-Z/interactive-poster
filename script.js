@@ -9,7 +9,7 @@ let currentBrushSize = 5;
 let textInputPosition = { x: 0, y: 0 };
 let isDrawingMode = false;
 
-const db = firebase.firestore();
+
 
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
