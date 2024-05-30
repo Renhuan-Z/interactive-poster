@@ -96,12 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
 
-        function resizeCanvas() {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
-
         function draw(event) {
             if (!drawing || isTextMode) return;
             context.lineWidth = currentBrushSize;
@@ -149,7 +143,41 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+        function resizeCanvas() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
+
         window.addEventListener('resize', resizeCanvas);
+
+        // 添加拖动功能
+        let isDragging = false;
+        let startX, startY;
+
+        canvas.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            startX = event.clientX;
+            startY = event.clientY;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                window.scrollBy(-dx, -dy);
+                startX = event.clientX;
+                startY = event.clientY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
     }
 });
 
