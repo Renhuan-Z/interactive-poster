@@ -1,20 +1,9 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-}
-
 #carousel-container {
-    position: relative;
-    width: 80%;
-    height: 60%;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    height: 100vh;
 }
 
 #carousel {
@@ -22,38 +11,31 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
+    height: 70%;
     position: relative;
 }
 
 .poster {
-    width: 40%;
-    height: 100%;
+    width: 60%;
+    height: 80%;
     margin: 0 2%;
-    transition: transform 0.5s, width 0.5s, height 0.5s, z-index 0.5s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-size: cover;
     background-position: center;
+    transition: transform 0.5s, opacity 0.5s;
 }
 
 .poster.current {
-    width: 60%;
-    height: 100%;
+    transform: scale(1.0);
     z-index: 3;
 }
 
-.poster.ended,
-.poster.upcoming {
-    width: 40%;
-    height: 80%;
+.poster.ended, .poster.upcoming {
+    transform: scale(0.8);
     z-index: 2;
+    opacity: 0.8;
 }
 
-#prev-button,
-#next-button {
+#prev-button, #next-button {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -64,33 +46,24 @@ body {
 }
 
 #prev-button {
-    left: 0;
+    left: 10px;
 }
 
 #next-button {
-    right: 0;
+    right: 10px;
 }
 
 #editor {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: white;
-    z-index: 10;
+    justify-content: center;
 }
 
 #drawing-canvas {
-    border: 1px solid #000;
+    border: 1px solid black;
 }
 
-#text-input {
-    position: absolute;
-    border: 1px solid #000;
-    background: rgba(255, 255, 255, 0.8);
+#color-picker, #brush-size, #text-button, #save-button, #exit-button {
+    margin: 10px;
 }
-
