@@ -1,7 +1,7 @@
 const posterImages = {
     ended: ["url('your-ended-poster-url1.jpg')", "url('your-ended-poster-url2.jpg')"],
-    current: ["url('your-current-poster-url.jpg')"],
-    upcoming: ["url('your-upcoming-poster-url1.jpg')", "url('your-upcoming-poster-url2.jpg')"]
+    current: ["url('https://github.com/Renhuan-Z/interactive-poster/blob/main/background.jpg?raw=true')"],
+    upcoming: ["url('https://github.com/Renhuan-Z/interactive-poster/blob/main/background2.jpg?raw=true')", "url('your-upcoming-poster-url2.jpg')"]
 };
 
 // 初始化轮播
