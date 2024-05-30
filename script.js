@@ -129,6 +129,7 @@ async function saveDrawing() {
     }
 }
 
+
 async function loadDrawings() {
     const q = db.collection('drawings').orderBy('createdAt', 'asc');
     const querySnapshot = await q.get();
@@ -165,5 +166,6 @@ async function loadDrawings() {
         });
     });
 }
+
 
 window.onload = loadDrawings;
