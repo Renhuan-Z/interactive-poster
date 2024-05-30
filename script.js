@@ -1,4 +1,3 @@
-
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -12,10 +11,19 @@ let textInputPosition = { x: 0, y: 0 };
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
     const backgroundImage = document.getElementById('background-image');
-    canvas.width = backgroundImage.clientWidth;
-    canvas.height = backgroundImage.clientHeight;
-    context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (backgroundImage.complete && backgroundImage.naturalHeight !== 0) {
+        canvas.width = backgroundImage.clientWidth;
+        canvas.height = backgroundImage.clientHeight;
+        context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+        backgroundImage.onload = () => {
+            canvas.width = backgroundImage.clientWidth;
+            canvas.height = backgroundImage.clientHeight;
+            context.fillStyle = "rgba(255, 255, 255, 0.1)";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        };
+    }
 }
 
 // 清空画布和数据库函数
