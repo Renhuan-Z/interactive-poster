@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
     async function loadPosters() {
         try {
             const snapshot = await getPosters();
+            if (!snapshot) {
+                throw new Error("No posters data found.");
+            }
             snapshot.forEach(doc => {
                 const data = doc.data();
                 let posterElement;
@@ -199,39 +202,10 @@ document.addEventListener("DOMContentLoaded", function () {
         function resizeCanvas() {
             canvas.width = img.width;
             canvas.height = img.height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings(); // 重新加载绘制内容
+            context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
         }
 
         window.addEventListener('resize', resizeCanvas);
-
-        // 添加拖动功能
-        let isDragging = false;
-        let startX, startY;
-
-        canvas.addEventListener('mousedown', (event) => {
-            isDragging = true;
-            startX = event.clientX;
-            startY = event.clientY;
-        });
-
-        canvas.addEventListener('mousemove', (event) => {
-            if (isDragging) {
-                const dx = event.clientX - startX;
-                const dy = event.clientY - startY;
-                window.scrollBy(-dx, -dy);
-                startX = event.clientX;
-                startY = event.clientY;
-            }
-        });
-
-        canvas.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
+        resizeCanvas(); // 初始调整画布大小
     }
 });
-
