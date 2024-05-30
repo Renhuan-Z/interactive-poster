@@ -29,10 +29,16 @@
     z-index: 3;
 }
 
-.poster.ended, .poster.upcoming {
+.poster.left-one, .poster.right-one {
     transform: scale(0.8);
     z-index: 2;
     opacity: 0.8;
+}
+
+.poster.left-two, .poster.right-two {
+    transform: scale(0.6);
+    z-index: 1;
+    opacity: 0.6;
 }
 
 #prev-button, #next-button {
@@ -67,3 +73,4 @@
 #color-picker, #brush-size, #text-button, #save-button, #exit-button {
     margin: 10px;
 }
+
