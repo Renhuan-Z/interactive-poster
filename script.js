@@ -166,75 +166,57 @@ async function loadDrawings() {
     });
 }
 
-window.onload = loadDrawings;
+window.onload = async () => {
+    await loadDrawings();
+    await loadAndDisplayPosters();
+};
 
-// 添加海报缩放功能
-function togglePosterSize(element) {
-    element.classList.toggle('active');
-    resizeCanvas();
-}
-
-// 获取海报数据
 async function getPosters() {
+    const q = db.collection('posters');
+    const querySnapshot = await q.get();
     const posters = [];
-    const snapshot = await db.collection('posters').get();
-    snapshot.forEach(doc => {
-        posters.push({ id: doc.id, ...doc.data() });
+    querySnapshot.forEach((doc) => {
+        posters.push(doc.data());
     });
     return posters;
 }
 
-// 更新海报状态
 function updatePosterStatus(posters) {
-    posters.forEach(poster => {
-        const startTime = new Date(poster.startTime);
-        const endTime = new Date(poster.endTime);
-        const now = new Date();
-        if (now >= startTime && now <= endTime) {
-            poster.status = 'current';
-        } else if (now < startTime) {
+    const now = new Date();
+    return posters.map(poster => {
+        const startDate = new Date(poster.startDate.seconds * 1000);
+        const endDate = new Date(poster.endDate.seconds * 1000);
+        if (now < startDate) {
             poster.status = 'upcoming';
-        } else {
+        } else if (now > endDate) {
             poster.status = 'ended';
+        } else {
+            poster.status = 'active';
         }
+        return poster;
     });
-    return posters;
 }
 
-// 显示海报
 function displayPosters(posters) {
-    const currentPoster = posters.find(poster => poster.status === 'current');
-    const endedPosters = posters.filter(poster => poster.status === 'ended');
-    const upcomingPosters = posters.filter(poster => poster.status === 'upcoming');
+    const endedPoster = posters.find(poster => poster.status === 'ended');
+    const activePoster = posters.find(poster => poster.status === 'active');
+    const upcomingPoster = posters.find(poster => poster.status === 'upcoming');
 
-    // 显示当前海报
-    if (currentPoster) {
-        document.getElementById('background-image').src = currentPoster.backgroundImageUrl;
+    if (endedPoster) {
+        document.getElementById('ended-poster').querySelector('img').src = endedPoster.backgroundImageUrl;
     }
 
-    // 显示已结束和未开始的海报
-    if (endedPosters.length > 0) {
-        document.getElementById('ended-poster').querySelector('img').src = endedPosters[0].backgroundImageUrl;
-    }
-    if (upcomingPosters.length > 0) {
-        document.getElementById('upcoming-poster').querySelector('img').src = upcomingPosters[0].backgroundImageUrl;
+    if (activePoster) {
+        document.getElementById('background-image').src = activePoster.backgroundImageUrl;
     }
 
-    // 显示附加海报
-    if (posters.length > 2) {
-        document.getElementById('additional-poster1').querySelector('img').src = posters[1].backgroundImageUrl;
-        document.getElementById('additional-poster2').querySelector('img').src = posters[2].backgroundImageUrl;
+    if (upcomingPoster) {
+        document.getElementById('upcoming-poster').querySelector('img').src = upcomingPoster.backgroundImageUrl;
     }
 }
 
-// 加载并显示海报
 async function loadAndDisplayPosters() {
     const posters = await getPosters();
     const updatedPosters = updatePosterStatus(posters);
     displayPosters(updatedPosters);
 }
-
-window.onload = async () => {
-    await loadDrawings();
-    await loadAndDisplayPosters();
-};
