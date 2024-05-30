@@ -3,36 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poster Carousel</title>
+    <title>Interactive Poster</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- 引入 Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script defer src="firebaseConfig.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
     <div id="carousel-container">
-        <div id="carousel">
+        <button id="prev-button">&#8249;</button>
+        <div id="poster-container">
             <div class="poster" id="poster-1"></div>
             <div class="poster" id="poster-2"></div>
             <div class="poster" id="poster-3"></div>
             <div class="poster" id="poster-4"></div>
             <div class="poster" id="poster-5"></div>
         </div>
-        <button id="prev-button">◀</button>
-        <button id="next-button">▶</button>
+        <button id="next-button">&#8250;</button>
     </div>
     <div id="editor" style="display: none;">
         <canvas id="drawing-canvas"></canvas>
-        <button id="exit-button">Exit</button>
-        <input type="color" id="color-picker">
-        <input type="range" id="brush-size" min="1" max="20">
-        <button id="text-button">Text</button>
-        <button id="save-button">Save</button>
-        <input type="text" id="text-input" style="display: none;">
+        <div id="controls">
+            <button id="exit-button">Exit</button>
+            <input type="color" id="color-picker">
+            <input type="range" id="brush-size" min="1" max="50">
+            <button id="text-button">Text</button>
+            <button id="save-button">Save</button>
+        </div>
     </div>
-    <script src="firebaseConfig.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
-
 
