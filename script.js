@@ -2,6 +2,15 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
+    let drawing = false;
+    let currentPath = [];
+    let history = [];
+    let currentColor = '#000000';
+    let currentBrushSize = 5;
+    let isTextMode = false;
+    let textInputPosition = { x: 0, y: 0 };
+    const canvas = document.getElementById('drawing-canvas');
+    const context = canvas.getContext('2d');
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
@@ -72,8 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
     async function enterDrawingMode() {
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
-        const canvas = document.getElementById('drawing-canvas');
-        const context = canvas.getContext('2d');
 
         const currentPosterElement = posters[currentIndex];
         const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
@@ -87,14 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 确保在图像加载后调用
         };
-
-        let drawing = false;
-        let currentPath = [];
-        let history = [];
-        let currentColor = '#000000';
-        let currentBrushSize = 5;
-        let isTextMode = false;
-        let textInputPosition = { x: 0, y: 0 };
 
         async function loadDrawings() {
             try {
@@ -221,3 +220,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
