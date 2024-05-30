@@ -7,6 +7,9 @@ let isTextMode = false;
 let currentColor = '#000000';
 let currentBrushSize = 5;
 let textInputPosition = { x: 0, y: 0 };
+let isDrawingMode = false;
+
+const db = firebase.firestore();
 
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
@@ -16,6 +19,21 @@ function resizeCanvas() {
         canvas.height = backgroundImage.clientHeight;
         context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
         context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+// 切换绘制模式
+function toggleDrawingMode() {
+    isDrawingMode = !isDrawingMode;
+    const controls = document.getElementById('drawing-controls');
+    const currentPoster = document.getElementById('current-poster');
+    if (isDrawingMode) {
+        controls.style.display = 'block';
+        currentPoster.classList.add('full-screen');
+        loadDrawings();
+    } else {
+        controls.style.display = 'none';
+        currentPoster.classList.remove('full-screen');
     }
 }
 
@@ -84,6 +102,8 @@ document.getElementById('toggle-mode').addEventListener('click', () => {
     document.getElementById('text-input-dialog').style.display = isTextMode ? 'block' : 'none';
     canvas.style.cursor = isTextMode ? 'text' : 'crosshair';
 });
+
+document.getElementById('exit-drawing-mode').addEventListener('click', toggleDrawingMode);
 
 canvas.addEventListener('click', (event) => {
     if (!isTextMode) return;
@@ -164,7 +184,32 @@ async function loadDrawings() {
     });
 }
 
-window.onload = async () => {
-    await loadDrawings();
-    resizeCanvas();
-};
+function displayPosters(posters) {
+    const endedPosters = document.getElementById('ended-posters');
+    const upcomingPosters = document.getElementById('upcoming-posters');
+    posters.forEach(poster => {
+        const posterElement = document.createElement('div');
+        posterElement.classList.add('poster-item');
+        posterElement.innerText = poster.id;
+
+        if (poster.status === 'ended') {
+            endedPosters.appendChild(posterElement);
+        } else if (poster.status === 'upcoming') {
+            upcomingPosters.appendChild(posterElement);
+        } else if (poster.status === 'current') {
+            const currentPoster = document.getElementById('current-poster');
+            const img = currentPoster.querySelector('img');
+            img.src = poster.backgroundImageUrl;
+            img.addEventListener('click', toggleDrawingMode);
+        }
+    });
+}
+
+async function init() {
+    const postersRef = db.collection('posters');
+    const snapshot = await postersRef.get();
+    const posters = snapshot.docs.map(doc => doc.data());
+    displayPosters(posters);
+}
+
+window.onload = init;
