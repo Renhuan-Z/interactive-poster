@@ -8,47 +8,89 @@ body {
     margin: 0;
 }
 
-.container {
+#carousel-container {
+    position: relative;
+    width: 80%;
+    height: 60%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
-.posters {
+#carousel {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
 .poster {
+    width: 40%;
+    height: 100%;
+    margin: 0 2%;
+    transition: transform 0.5s, width 0.5s, height 0.5s, z-index 0.5s;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
 }
 
-.controls {
-    margin-top: 20px;
+.poster.current {
+    width: 60%;
+    height: 100%;
+    z-index: 3;
 }
 
-.hidden {
-    display: none;
+.poster.ended,
+.poster.upcoming {
+    width: 40%;
+    height: 80%;
+    z-index: 2;
 }
 
-#drawing-mode {
+#prev-button,
+#next-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+#prev-button {
+    left: 0;
+}
+
+#next-button {
+    right: 0;
+}
+
+#editor {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 10;
 }
 
 #drawing-canvas {
     border: 1px solid #000;
 }
 
-.toolbar {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+#text-input {
+    position: absolute;
+    border: 1px solid #000;
+    background: rgba(255, 255, 255, 0.8);
 }
+
