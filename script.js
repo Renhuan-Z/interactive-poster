@@ -1,8 +1,3 @@
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -41,11 +36,6 @@ async function clearCanvasAndDatabase() {
 
 // 确保 clearCanvasAndDatabase 函数在全局作用域中
 window.clearCanvasAndDatabase = clearCanvasAndDatabase;
-
-window.onload = function() {
-    loadPosters();  // 确保先加载海报信息
-    loadDrawings(); // 然后加载绘图信息
-};
 
 // 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
@@ -176,7 +166,6 @@ async function loadDrawings() {
     });
 }
 
-
 async function loadPosters() {
     const q = db.collection('posters').orderBy('startTime', 'asc');
     const querySnapshot = await q.get();
@@ -197,14 +186,13 @@ async function loadPosters() {
             currentPoster.appendChild(img);
             currentPoster.style.display = 'block';
             img.id = 'background-image';
-            resizeCanvas();
+            img.onload = () => resizeCanvas(); // 等待图像加载后调整canvas尺寸
             loadDrawings();
         } else if (poster.status === 'upcoming') {
             upcomingPosters.appendChild(img);
         }
     });
 }
-
 
 function init() {
     loadPosters();
