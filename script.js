@@ -2,37 +2,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
-    let drawing = false;
-    let currentPath = [];
-    let history = [];
-    let currentColor = '#000000';
-    let currentBrushSize = 5;
-    let isTextMode = false;
-    let textInputPosition = { x: 0, y: 0 };
-    const canvas = document.getElementById('drawing-canvas');
-    const context = canvas.getContext('2d');
-    let postersDataCache = null; // 缓存海报数据
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
-        if (postersDataCache) {
-            return postersDataCache;
-        }
         try {
             const snapshot = await db.collection('posters').get();
-            postersDataCache = snapshot;
-            return snapshot;
-        } catch (error) {
-            console.error("Error getting posters: ", error);
-        }
-    }
-
-    async function loadPosters() {
-        try {
-            const snapshot = await getPosters();
-            if (!snapshot) {
-                throw new Error("No posters data found.");
-            }
             snapshot.forEach(doc => {
                 const data = doc.data();
                 let posterElement;
@@ -48,11 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
-            console.error("Error loading posters: ", error);
+            console.error("Error getting posters: ", error);
         }
     }
 
-    loadPosters();
+    getPosters();
 
     // 轮播功能
     document.getElementById('prev-button').addEventListener('click', () => {
@@ -98,6 +72,8 @@ document.addEventListener("DOMContentLoaded", function () {
     async function enterDrawingMode() {
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
+        const canvas = document.getElementById('drawing-canvas');
+        const context = canvas.getContext('2d');
 
         const currentPosterElement = posters[currentIndex];
         const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
@@ -111,6 +87,14 @@ document.addEventListener("DOMContentLoaded", function () {
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 确保在图像加载后调用
         };
+
+        let drawing = false;
+        let currentPath = [];
+        let history = [];
+        let currentColor = '#000000';
+        let currentBrushSize = 5;
+        let isTextMode = false;
+        let textInputPosition = { x: 0, y: 0 };
 
         async function loadDrawings() {
             try {
@@ -202,10 +186,39 @@ document.addEventListener("DOMContentLoaded", function () {
         function resizeCanvas() {
             canvas.width = img.width;
             canvas.height = img.height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            loadDrawings(); // 重新加载绘制内容
         }
 
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas(); // 初始调整画布大小
+
+        // 添加拖动功能
+        let isDragging = false;
+        let startX, startY;
+
+        canvas.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            startX = event.clientX;
+            startY = event.clientY;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                window.scrollBy(-dx, -dy);
+                startX = event.clientX;
+                startY = event.clientY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
     }
 });
+
