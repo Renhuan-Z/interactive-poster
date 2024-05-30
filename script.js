@@ -51,9 +51,12 @@ async function getPosters() {
     const querySnapshot = await db.collection('posters').get();
     querySnapshot.forEach((doc) => {
         const poster = doc.data();
+        console.log('Poster:', poster); // 添加日志输出
+
         const img = document.createElement('img');
         img.src = poster.backgroundImageUrl;
         img.alt = poster.id;
+        console.log('Image URL:', poster.backgroundImageUrl); // 添加日志输出
 
         if (poster.status === 'current') {
             const currentPosterDiv = document.getElementById('current-poster');
