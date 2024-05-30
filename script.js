@@ -74,8 +74,19 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('editor').style.display = 'flex';
         const canvas = document.getElementById('drawing-canvas');
         const context = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+
+        const currentPosterElement = posters[currentIndex];
+        const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
+
+        const img = new Image();
+        img.src = posterBackgroundImage;
+
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            loadDrawings();
+        };
 
         let drawing = false;
         let currentPath = [];
@@ -86,48 +97,9 @@ document.addEventListener("DOMContentLoaded", function () {
         let textInputPosition = { x: 0, y: 0 };
 
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            context.fillStyle = "rgba(255, 255, 255, 0.1)";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        // 加载绘制记录
-        async function loadDrawings() {
-            try {
-                const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-                const paths = {};
-
-                snapshot.forEach(doc => {
-                    const point = doc.data();
-                    if (!paths[point.pathIndex]) {
-                        paths[point.pathIndex] = [];
-                    }
-                    paths[point.pathIndex].push(point);
-                });
-
-                Object.values(paths).forEach(path => {
-                    context.beginPath();
-                    path.forEach((point, index) => {
-                        if (point.type === 'text') {
-                            context.fillStyle = point.color;
-                            context.font = '12px Arial';
-                            context.fillText(point.text, point.x, point.y);
-                        } else {
-                            context.strokeStyle = point.color;
-                            context.lineWidth = point.size;
-                            if (index === 0) {
-                                context.moveTo(point.x, point.y);
-                            } else {
-                                context.lineTo(point.x, point.y);
-                            }
-                        }
-                    });
-                    context.stroke();
-                });
-            } catch (error) {
-                console.error('Error loading drawings:', error);
-            }
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
 
         function draw(event) {
@@ -135,8 +107,9 @@ document.addEventListener("DOMContentLoaded", function () {
             context.lineWidth = currentBrushSize;
             context.lineCap = 'round';
             context.strokeStyle = currentColor;
-            const x = event.clientX;
-            const y = event.clientY;
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
             context.lineTo(x, y);
             context.stroke();
             context.beginPath();
@@ -176,9 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        await loadDrawings();
     }
 });
 
