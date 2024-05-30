@@ -12,14 +12,15 @@
         </div>
         <div class="poster" id="current-poster">
             <h2>Current Poster</h2>
-            <img id="background-image" src="background.jpg" alt="Current Poster">
+            <img id="background-image" src="" alt="Current Poster">
             <canvas id="drawing-canvas"></canvas>
         </div>
         <div class="poster" id="upcoming-posters">
             <h2>Upcoming Posters</h2>
         </div>
     </div>
-    <div class="controls">
+    <div class="controls" id="drawing-controls" style="display: none;">
+        <button id="exit-drawing-mode">Exit Drawing Mode</button>
         <button id="toggle-mode">Toggle Mode</button>
         <input type="color" id="color-picker" value="#000000">
         <input type="range" id="brush-size" min="1" max="20" value="5">
