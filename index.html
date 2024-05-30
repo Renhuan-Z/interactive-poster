@@ -15,9 +15,10 @@
         #canvas-container {
             position: relative;
         }
-        #drawing-canvas {
-            border: 1px solid black;
-            background: rgba(255, 255, 255, 0.1);
+       #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         .poster-thumbnail {
             width: 100px;
@@ -28,7 +29,11 @@
             cursor: pointer;
         }
         #background-image {
-            display: none;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
         }#poster-list {
             display: flex;
             justify-content: space-around;
