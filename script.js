@@ -1,15 +1,3 @@
-const firebaseConfig = {
-    apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
-    authDomain: "interactive-poster-dad2f.firebaseapp.com",
-    projectId: "interactive-poster-dad2f",
-    storageBucket: "interactive-poster-dad2f.appspot.com",
-    messagingSenderId: "759472690939",
-    appId: "1:759472690939:web:c837fba2dbad00a208025e"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
 const canvas = document.getElementById('drawing-canvas');
 const context = canvas.getContext('2d');
 let drawing = false;
@@ -23,10 +11,12 @@ let textInputPosition = { x: 0, y: 0 };
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
     const backgroundImage = document.getElementById('background-image');
-    canvas.width = backgroundImage.clientWidth;
-    canvas.height = backgroundImage.clientHeight;
-    context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (backgroundImage) {
+        canvas.width = backgroundImage.clientWidth;
+        canvas.height = backgroundImage.clientHeight;
+        context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
 }
 
 // 清空画布和数据库函数
