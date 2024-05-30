@@ -11,29 +11,18 @@ let textInputPosition = { x: 0, y: 0 };
 // 调整canvas的尺寸以匹配背景图像
 function resizeCanvas() {
     const backgroundImage = document.getElementById('background-image');
-    if (backgroundImage.complete && backgroundImage.naturalHeight !== 0) {
-        canvas.width = backgroundImage.clientWidth;
-        canvas.height = backgroundImage.clientHeight;
-        context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
-        context.fillRect(0, 0, canvas.width, canvas.height);
-    } else {
-        backgroundImage.onload = () => {
-            canvas.width = backgroundImage.clientWidth;
-            canvas.height = backgroundImage.clientHeight;
-            context.fillStyle = "rgba(255, 255, 255, 0.1)";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-        };
-    }
+    canvas.width = backgroundImage.clientWidth;
+    canvas.height = backgroundImage.clientHeight;
+    context.fillStyle = "rgba(255, 255, 255, 0.1)"; // 10% 透明度的白色覆盖层
+    context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 // 清空画布和数据库函数
 async function clearCanvasAndDatabase() {
-    // 清空画布
     context.clearRect(0, 0, canvas.width, canvas.height);
     history = [];
     resizeCanvas(); // 重新填充背景
 
-    // 删除数据库中的数据
     const q = db.collection('drawings');
     const querySnapshot = await q.get();
     querySnapshot.forEach((doc) => {
@@ -43,10 +32,8 @@ async function clearCanvasAndDatabase() {
     console.log('Canvas and database cleared');
 }
 
-// 确保 clearCanvasAndDatabase 函数在全局作用域中
 window.clearCanvasAndDatabase = clearCanvasAndDatabase;
 
-// 监听窗口调整大小事件，调整canvas尺寸
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
@@ -175,4 +162,7 @@ async function loadDrawings() {
     });
 }
 
-window.onload = loadDrawings;
+window.onload = async () => {
+    await loadDrawings();
+    resizeCanvas();
+};
