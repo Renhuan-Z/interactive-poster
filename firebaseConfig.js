@@ -12,6 +12,6 @@ apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
   appId: "1:759472690939:web:c837fba2dbad00a208025e"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// 初始化 Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
