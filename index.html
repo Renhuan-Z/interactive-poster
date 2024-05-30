@@ -5,80 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Poster</title>
     <style>
-        #container {
+        #main-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            flex-direction: column;
         }
-        .poster {
+        #canvas-container {
             position: relative;
-            margin: 10px;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-        .poster img {
-            display: block;
-            max-width: 100%;
-            max-height: 100%;
-        }
-        .poster.active {
-            transform: scale(1.5);
         }
         #drawing-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* Prevent pointer events on canvas */
-        }
-        #controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-        }
-        #text-input-dialog {
-            display: none;
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 10px;
             border: 1px solid black;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .poster-thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #000;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #background-image {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="ended-poster" class="poster">
-            <img src="" alt="Ended Poster">
-        </div>
-        <div id="upcoming-poster" class="poster">
-            <img src="" alt="Upcoming Poster">
-        </div>
-        <div id="current-poster" class="poster" onclick="togglePosterSize(this)">
-            <img id="background-image" src="background.jpg" alt="Current Poster">
+    <div id="main-container">
+        <div id="canvas-container">
+            <img id="background-image" src="" alt="Background Image">
             <canvas id="drawing-canvas"></canvas>
         </div>
-    </div>
-
-    <div id="controls">
+        <button id="save-button">Save</button>
         <input type="color" id="color-picker">
         <input type="range" id="brush-size" min="1" max="50" value="5">
         <button id="toggle-mode">Toggle Mode</button>
-        <button id="save-button">Save</button>
+        <div id="text-input-dialog" style="display: none;">
+            <input type="text" id="text-input">
+            <button id="text-confirm-button">Confirm</button>
+        </div>
+        <div>
+            <div id="ended-poster">
+                <img src="" alt="Ended Poster" class="poster-thumbnail">
+                <p>Ended Poster</p>
+            </div>
+            <div id="upcoming-poster">
+                <img src="" alt="Upcoming Poster" class="poster-thumbnail">
+                <p>Upcoming Poster</p>
+            </div>
+        </div>
     </div>
-
-    <div id="text-input-dialog">
-        <input type="text" id="text-input">
-        <button id="text-confirm-button">Confirm</button>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script src="firebaseConfig.js"></script>
     <script src="script.js"></script>
 </body>
