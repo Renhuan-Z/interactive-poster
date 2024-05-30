@@ -1,7 +1,4 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-// firebaseConfig.js
+
 var firebaseConfig = {
   apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
   authDomain: "interactive-poster-dad2f.firebaseapp.com",
