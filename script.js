@@ -1,5 +1,3 @@
-
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCC4xyp4HniwI46YFJoWf-BgjyhtDia18o",
   authDomain: "interactive-poster-dad2f.firebaseapp.com",
