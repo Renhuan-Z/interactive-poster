@@ -94,6 +94,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
                 snapshot.forEach(doc => {
                     const drawingHistory = doc.data().history;
+                    if (!Array.isArray(drawingHistory)) {
+                        console.error('Invalid drawing history format:', drawingHistory);
+                        return;
+                    }
                     const paths = drawingHistory.reduce((acc, point) => {
                         if (!acc[point.pathIndex]) {
                             acc[point.pathIndex] = [];
