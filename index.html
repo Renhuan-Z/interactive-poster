@@ -30,39 +30,37 @@
         #background-image {
             display: none;
         }
-    </style>
+ </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="firebaseConfig.js"></script>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="main-container">
-        <div id="canvas-container">
-            <img id="background-image" src="" alt="Background Image">
-            <canvas id="drawing-canvas"></canvas>
-        </div>
-        <button id="save-button">Save</button>
-        <input type="color" id="color-picker">
-        <input type="range" id="brush-size" min="1" max="50" value="5">
-        <button id="toggle-mode">Toggle Mode</button>
-        <div id="text-input-dialog" style="display: none;">
-            <input type="text" id="text-input">
-            <button id="text-confirm-button">Confirm</button>
-        </div>
-        <div>
-            <div id="ended-poster">
-                <img src="" alt="Ended Poster" class="poster-thumbnail">
-                <p>Ended Poster</p>
-            </div>
-            <div id="upcoming-poster">
-                <img src="" alt="Upcoming Poster" class="poster-thumbnail">
-                <p>Upcoming Poster</p>
+    <div id="container">
+        <canvas id="drawing-canvas"></canvas>
+        <img id="background-image" src="background.jpg" alt="Poster Background" style="display:none;">
+        <div id="controls">
+            <button id="save-button">Save</button>
+            <input type="color" id="color-picker">
+            <input type="range" id="brush-size" min="1" max="10">
+            <button id="toggle-mode">Toggle Mode</button>
+            <div id="text-input-dialog" style="display:none;">
+                <input type="text" id="text-input">
+                <button id="text-confirm-button">Confirm</button>
             </div>
         </div>
     </div>
-    <script src="firebaseConfig.js"></script>
-    <script src="script.js"></script>
+    <div id="other-posters">
+        <div id="ended-poster">
+            <img src="" alt="Ended Poster">
+            <p>Ended Poster</p>
+        </div>
+        <div id="upcoming-poster">
+            <img src="" alt="Upcoming Poster">
+            <p>Upcoming Poster</p>
+        </div>
+    </div>
 </body>
 </html>
 
