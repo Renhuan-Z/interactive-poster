@@ -105,7 +105,7 @@ async function enterDrawingMode() {
         img.src = posterBackgroundImage;
 
         img.onload = () => {
-            // 调整画布大小以适应屏幕宽度
+            // 调整画布大小以适应屏幕宽度并保持比例
             const width = window.innerWidth;
             const height = (img.height / img.width) * width;
             canvas.width = width;
@@ -210,9 +210,9 @@ async function enterDrawingMode() {
         });
 
         function resizeCanvas() {
-            // 调整画布大小以适应屏幕宽度
+            // 调整画布大小以适应屏幕宽度并保持比例
             const width = window.innerWidth;
-            const height = (img.height / img.width) * width;
+            const height = (canvas.height / canvas.width) * width;
             canvas.width = width;
             canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
