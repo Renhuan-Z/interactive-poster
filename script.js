@@ -1,31 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded and script running");
-
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
-    const posters = document.querySelectorAll('.poster');
-
-    console.log("Previous button element:", prevButton);
-    console.log("Next button element:", nextButton);
-
-    prevButton.addEventListener('click', () => {
-        console.log("Prev button clicked");
-    });
-
-    nextButton.addEventListener('click', () => {
-        console.log("Next button clicked");
-    });
-
-    posters.forEach((poster, index) => {
-        poster.addEventListener('click', () => {
-            console.log(`Poster ${index + 1} clicked`);
-        });
-    });
-});
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM content loaded and script running");
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
     const prevButton = document.getElementById('prev-button');
@@ -122,8 +96,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     posters.forEach(poster => {
         poster.addEventListener('click', () => {
+            console.log(`Poster clicked: ${poster.dataset.posterId}`);
             if (poster.classList.contains('current') && poster.dataset.open === "true") {
-                console.log("Poster clicked and opening drawing mode:", poster.dataset.posterId);
+                console.log("Opening drawing mode for poster:", poster.dataset.posterId);
                 currentPosterId = poster.dataset.posterId;
                 enterDrawingMode();
             }
@@ -284,4 +259,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
