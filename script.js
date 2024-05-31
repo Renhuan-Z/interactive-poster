@@ -349,5 +349,8 @@ async function enterDrawingMode() {
             isDraggingTextInput = false;
         });
 
+ 
     }
+
+    // 其他代码...
 });
