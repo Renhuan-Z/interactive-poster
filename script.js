@@ -1,33 +1,39 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM content loaded and script running");
     let currentIndex = 2; // 当前展示中间的海报索引
-    const carousel = document.getElementById('carousel');
+    const posters = document.querySelectorAll('.poster');
+    let currentPosterId;
+
+    console.log("DOM content loaded and script running");
+
+    // 获取前后按钮元素
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
-    let currentPosterId;
-    let posters = []; // 动态获取的海报元素列表
-
     console.log("Previous button element:", prevButton);
     console.log("Next button element:", nextButton);
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
+        console.log("Fetching posters from Firestore...");
         try {
-            console.log("Fetching posters from Firestore...");
             const snapshot = await db.collection('posters').get();
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log("Poster data:", data);
-                
-                const posterElement = document.createElement('div');
-                posterElement.className = 'poster';
-                posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
-                posterElement.dataset.posterId = doc.id;
-                posterElement.dataset.open = data.status === "current" ? "true" : "false";
-                carousel.appendChild(posterElement);
-                posters.push(posterElement);
-                
-                console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
+                let posterElement;
+                if (doc.id === 'poster01') {
+                    posterElement = document.getElementById('poster-1');
+                } else if (doc.id === 'poster02') {
+                    posterElement = document.getElementById('poster-2');
+                } else if (doc.id === 'poster03') {
+                    posterElement = document.getElementById('poster-3');
+                } else if (doc.id === 'poster04') {
+                    posterElement = document.getElementById('poster-4');
+                }
+                if (posterElement) {
+                    posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
+                    posterElement.dataset.posterId = doc.id;
+                    console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
+                }
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
@@ -39,59 +45,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 轮播功能
     prevButton.addEventListener('click', () => {
-        console.log("Prev button clicked");
         currentIndex = (currentIndex - 1 + posters.length) % posters.length;
         updateCarousel();
     });
 
     nextButton.addEventListener('click', () => {
-        console.log("Next button clicked");
         currentIndex = (currentIndex + 1) % posters.length;
         updateCarousel();
     });
 
     function updateCarousel() {
-        console.log("Updating carousel with current index:", currentIndex);
         posters.forEach((poster, index) => {
             poster.classList.remove('current', 'left-one', 'right-one', 'left-two', 'right-two');
+            poster.style.filter = 'blur(10px)'; // 默认模糊
+
             if (index === currentIndex) {
                 poster.classList.add('current');
-                if (poster.dataset.open === "true") {
-                    poster.style.opacity = "1";
-                } else {
-                    poster.style.opacity = "0.5";
-                }
+                poster.style.filter = 'none'; // 当前海报清晰
             } else if (index === (currentIndex - 1 + posters.length) % posters.length) {
                 poster.classList.add('left-one');
-                poster.style.opacity = "0.5";
             } else if (index === (currentIndex + 1) % posters.length) {
                 poster.classList.add('right-one');
-                poster.style.opacity = "0.5";
             } else if (index === (currentIndex - 2 + posters.length) % posters.length) {
                 poster.classList.add('left-two');
-                poster.style.opacity = "0.5";
             } else if (index === (currentIndex + 2) % posters.length) {
                 poster.classList.add('right-two');
-                poster.style.opacity = "0.5";
             }
         });
         console.log("Carousel updated. Current index:", currentIndex);
     }
 
-    carousel.addEventListener('click', event => {
-        const poster = event.target.closest('.poster');
-        if (poster) {
-            console.log(`Poster clicked: ${poster.dataset.posterId}`);
-            if (poster.classList.contains('current') && poster.dataset.open === "true") {
-                console.log("Opening drawing mode for poster:", poster.dataset.posterId);
+    posters.forEach(poster => {
+        poster.addEventListener('click', () => {
+            if (poster.classList.contains('current')) {
                 currentPosterId = poster.dataset.posterId;
+                console.log("Poster clicked:", currentPosterId);
                 enterDrawingMode();
             }
-        }
+        });
     });
 
-    // 进入绘制模式
-async function enterDrawingMode() {
+    async function enterDrawingMode() {
         console.log("Entering drawing mode for poster:", currentPosterId);
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
@@ -183,17 +177,6 @@ async function enterDrawingMode() {
 
         document.getElementById('color-picker').addEventListener('input', event => { currentColor = event.target.value; });
         document.getElementById('brush-size').addEventListener('input', event => { currentBrushSize = event.target.value; });
-        document.getElementById('text-button').addEventListener('click', () => {
-            if (!isTextMode) {
-                textInput.style.display = 'block';
-                textInput.style.left = '50%';
-                textInput.style.top = '50%';
-                textInput.focus();
-            } else {
-                textInput.style.display = 'none';
-            }
-            isTextMode = !isTextMode;
-        });
 
         document.getElementById('exit-button').addEventListener('click', () => {
             document.getElementById('carousel-container').style.display = 'flex';
@@ -291,8 +274,8 @@ async function enterDrawingMode() {
         textInput.addEventListener('blur', () => {
             if (textInput.value) {
                 const rect = canvas.getBoundingClientRect();
-                const x = textInput.offsetLeft - rect.left;
-                const y = textInput.offsetTop - rect.top;
+                const x = parseInt(textInput.style.left) - rect.left;
+                const y = parseInt(textInput.style.top) - rect.top;
                 context.fillStyle = currentColor;
                 context.font = '16px Arial';
                 context.fillText(textInput.value, x, y);
@@ -328,6 +311,4 @@ async function enterDrawingMode() {
             isDraggingTextInput = false;
         });
     }
-
-    // 其他代码...
 });
