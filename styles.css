@@ -25,7 +25,6 @@
     background-repeat: no-repeat;
     background-position: center;
     transition: transform 0.5s, filter 0.5s, opacity 0.5s;
-    height: auto;
 }
 
 .poster.current {
@@ -58,7 +57,6 @@
     z-index: 1000; /* 增加 z-index 确保按钮在最前 */
 }
 
-
 #prev-button {
     left: 10px;
 }
@@ -66,7 +64,6 @@
 #next-button {
     right: 10px;
 }
-
 
 #editor {
     display: none;
@@ -83,7 +80,6 @@
     width: 100%; /* 使画布宽度占据编辑器的全部宽度 */
     height: auto; /* 高度自适应 */
     max-width: 100%; /* 确保宽度不超过容器 */
-    max-height: 100vh; /* 确保高度不超过视口高度 */
     object-fit: contain; /* 保持比例 */
 }
 
@@ -96,9 +92,7 @@
     gap: 10px;
 }
 
-
-
-
 #color-picker, #brush-size, #text-button, #save-button, #exit-button {
     margin: 10px;
 }
+
