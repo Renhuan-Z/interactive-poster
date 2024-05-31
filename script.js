@@ -106,8 +106,10 @@ async function enterDrawingMode() {
 
         img.onload = () => {
             // 调整画布大小以适应屏幕宽度
-            canvas.width = window.innerWidth;
-            canvas.height = (img.height / img.width) * canvas.width;
+            const width = window.innerWidth;
+            const height = (img.height / img.width) * width;
+            canvas.width = width;
+            canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 确保在图像加载后调用
         };
@@ -209,8 +211,10 @@ async function enterDrawingMode() {
 
         function resizeCanvas() {
             // 调整画布大小以适应屏幕宽度
-            canvas.width = window.innerWidth;
-            canvas.height = (img.height / img.width) * canvas.width;
+            const width = window.innerWidth;
+            const height = (img.height / img.width) * width;
+            canvas.width = width;
+            canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 重新加载绘制内容
         }
