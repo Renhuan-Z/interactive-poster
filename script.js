@@ -202,19 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        function resizeCanvas() {
-            // 调整画布大小以适应屏幕宽度并保持比例
-            const width = window.innerWidth;
-            const height = (canvas.height / canvas.width) * width;
-            canvas.width = width;
-            canvas.height = height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings(); // 重新加载绘制内容
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-
-        // 添加双指拖动功能
+        // 双指拖动功能
         let isDragging = false;
         let startX, startY;
         let initialPinchDistance = null;
