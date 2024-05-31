@@ -1,3 +1,4 @@
+
 #carousel-container {
     display: flex;
     justify-content: center;
@@ -95,4 +96,3 @@
 #color-picker, #brush-size, #text-button, #save-button, #exit-button {
     margin: 10px;
 }
-
