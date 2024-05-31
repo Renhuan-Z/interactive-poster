@@ -105,7 +105,7 @@ async function enterDrawingMode() {
         img.src = posterBackgroundImage;
 
         img.onload = () => {
-            // 调整画布大小以适应屏幕宽度并保持比例
+            // 设置画布宽度和高度，并保持比例
             const width = window.innerWidth;
             const height = (img.height / img.width) * width;
             canvas.width = width;
