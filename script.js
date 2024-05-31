@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 进入绘制模式
-    async function enterDrawingMode() {
+async function enterDrawingMode() {
         console.log("Entering drawing mode for poster:", currentPosterId);
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
@@ -105,8 +105,9 @@ document.addEventListener("DOMContentLoaded", function () {
         img.src = posterBackgroundImage;
 
         img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
+            // 调整画布大小以适应屏幕宽度
+            canvas.width = window.innerWidth;
+            canvas.height = (img.height / img.width) * canvas.width;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 确保在图像加载后调用
         };
@@ -207,8 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         function resizeCanvas() {
-            canvas.width = img.width;
-            canvas.height = img.height;
+            // 调整画布大小以适应屏幕宽度
+            canvas.width = window.innerWidth;
+            canvas.height = (img.height / img.width) * canvas.width;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 重新加载绘制内容
         }
@@ -244,4 +246,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
