@@ -353,4 +353,4 @@ async function enterDrawingMode() {
     }
 
     // 其他代码...
-});
+};
