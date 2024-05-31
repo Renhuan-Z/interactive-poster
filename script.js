@@ -12,10 +12,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 const data = doc.data();
                 console.log("Poster data:", data);
                 let posterElement;
-                if (doc.id === 'poster01') {
-                    posterElement = document.getElementById('poster-3');
-                } else if (doc.id === 'poster02') {
-                    posterElement = document.getElementById('poster-4');
+                switch (doc.id) {
+                    case 'poster01':
+                        posterElement = document.getElementById('poster-1');
+                        break;
+                    case 'poster02':
+                        posterElement = document.getElementById('poster-2');
+                        break;
+                    case 'poster03':
+                        posterElement = document.getElementById('poster-3');
+                        break;
+                    case 'poster04':
+                        posterElement = document.getElementById('poster-4');
+                        break;
+                    case 'poster05':
+                        posterElement = document.getElementById('poster-5');
+                        break;
+                    default:
+                        console.warn(`No element for ${doc.id}`);
+                        return;
                 }
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
