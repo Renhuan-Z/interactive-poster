@@ -19,7 +19,7 @@
 .poster {
     flex-shrink: 0;
     width: 20%;
-    height: 80%;
+    height: auto;
     margin: 0 2%;
     background-size: contain;
     background-repeat: no-repeat;
