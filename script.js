@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
                     posterElement.dataset.posterId = doc.id;
+                    posterElement.dataset.open = data.open; // 添加开放状态
                     console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
                 }
             });
@@ -60,19 +61,25 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateCarousel() {
         posters.forEach((poster, index) => {
             poster.classList.remove('current', 'left-one', 'right-one', 'left-two', 'right-two');
-            poster.style.filter = 'blur(10px)'; // 默认模糊
-
             if (index === currentIndex) {
                 poster.classList.add('current');
-                poster.style.filter = 'none'; // 当前海报清晰
+                if (poster.dataset.open === "true") {
+                    poster.style.opacity = "1";
+                } else {
+                    poster.style.opacity = "0.5";
+                }
             } else if (index === (currentIndex - 1 + posters.length) % posters.length) {
                 poster.classList.add('left-one');
+                poster.style.opacity = "0.5";
             } else if (index === (currentIndex + 1) % posters.length) {
                 poster.classList.add('right-one');
+                poster.style.opacity = "0.5";
             } else if (index === (currentIndex - 2 + posters.length) % posters.length) {
                 poster.classList.add('left-two');
+                poster.style.opacity = "0.5";
             } else if (index === (currentIndex + 2) % posters.length) {
                 poster.classList.add('right-two');
+                poster.style.opacity = "0.5";
             }
         });
         console.log("Carousel updated. Current index:", currentIndex);
@@ -80,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     posters.forEach(poster => {
         poster.addEventListener('click', () => {
-            if (poster.classList.contains('current')) {
+            if (poster.classList.contains('current') && poster.dataset.open === "true") {
                 currentPosterId = poster.dataset.posterId;
                 enterDrawingMode();
             }
@@ -240,4 +247,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
 
