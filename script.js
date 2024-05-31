@@ -221,32 +221,48 @@ async function enterDrawingMode() {
 
         window.addEventListener('resize', resizeCanvas);
 
-        // 添加拖动功能
+        // 添加双指拖动功能
         let isDragging = false;
         let startX, startY;
+        let initialPinchDistance = null;
+        let initialScrollY = window.scrollY;
 
-        canvas.addEventListener('mousedown', (event) => {
-            isDragging = true;
-            startX = event.clientX;
-            startY = event.clientY;
-        });
-
-        canvas.addEventListener('mousemove', (event) => {
-            if (isDragging) {
-                const dx = event.clientX - startX;
-                const dy = event.clientY - startY;
-                window.scrollBy(-dx, -dy);
-                startX = event.clientX;
-                startY = event.clientY;
+        function handleTouchStart(event) {
+            if (event.touches.length === 2) {
+                isDragging = true;
+                startX = event.touches[0].clientX;
+                startY = event.touches[0].clientY;
+                initialPinchDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+                initialScrollY = window.scrollY;
             }
-        });
+        }
 
-        canvas.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+        function handleTouchMove(event) {
+            if (isDragging && event.touches.length === 2) {
+                const currentPinchDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+                const dy = event.touches[0].clientY - startY;
+                window.scrollTo(0, initialScrollY - dy);
+            }
+        }
 
-        canvas.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
+        function handleTouchEnd(event) {
+            if (event.touches.length < 2) {
+                isDragging = false;
+                initialPinchDistance = null;
+            }
+        }
+
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        canvas.addEventListener('touchend', handleTouchEnd);
+        canvas.addEventListener('touchcancel', handleTouchEnd);
     }
+
+    // 其他代码...
 });
