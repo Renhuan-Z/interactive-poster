@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM content loaded and script running");
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function updateCarousel() {
+        console.log("Updating carousel with current index:", currentIndex);
         posters.forEach((poster, index) => {
             poster.classList.remove('current', 'left-one', 'right-one', 'left-two', 'right-two');
             if (index === currentIndex) {
@@ -90,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
     posters.forEach(poster => {
         poster.addEventListener('click', () => {
             if (poster.classList.contains('current') && poster.dataset.open === "true") {
+                console.log("Poster clicked and opening drawing mode:", poster.dataset.posterId);
                 currentPosterId = poster.dataset.posterId;
                 enterDrawingMode();
             }
@@ -98,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 进入绘制模式
     async function enterDrawingMode() {
+        console.log("Entering drawing mode for poster:", currentPosterId);
         document.getElementById('carousel-container').style.display = 'none';
         document.getElementById('editor').style.display = 'flex';
         const canvas = document.getElementById('drawing-canvas');
