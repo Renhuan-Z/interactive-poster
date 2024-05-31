@@ -122,37 +122,6 @@ async function enterDrawingMode() {
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
 
-        async function enterDrawingMode() {
-        console.log("Entering drawing mode for poster:", currentPosterId);
-        document.getElementById('carousel-container').style.display = 'none';
-        document.getElementById('editor').style.display = 'flex';
-        const canvas = document.getElementById('drawing-canvas');
-        const context = canvas.getContext('2d');
-
-        const currentPosterElement = posters[currentIndex];
-        const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
-
-        const img = new Image();
-        img.src = posterBackgroundImage;
-
-        img.onload = () => {
-            // 设置画布宽度和高度，并保持比例
-            const width = window.innerWidth;
-            const height = (img.height / img.width) * width;
-            canvas.width = width;
-            canvas.height = height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings(); // 确保在图像加载后调用
-        };
-
-        let drawing = false;
-        let currentPath = [];
-        let history = [];
-        let currentColor = '#000000';
-        let currentBrushSize = 5;
-        let isTextMode = false;
-        let textInputPosition = { x: 0, y: 0 };
-
         async function loadDrawings() {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
@@ -214,7 +183,17 @@ async function enterDrawingMode() {
 
         document.getElementById('color-picker').addEventListener('input', event => { currentColor = event.target.value; });
         document.getElementById('brush-size').addEventListener('input', event => { currentBrushSize = event.target.value; });
-        document.getElementById('text-button').addEventListener('click', () => { isTextMode = !isTextMode; });
+        document.getElementById('text-button').addEventListener('click', () => {
+            if (!isTextMode) {
+                textInput.style.display = 'block';
+                textInput.style.left = '50%';
+                textInput.style.top = '50%';
+                textInput.focus();
+            } else {
+                textInput.style.display = 'none';
+            }
+            isTextMode = !isTextMode;
+        });
 
         document.getElementById('exit-button').addEventListener('click', () => {
             document.getElementById('carousel-container').style.display = 'flex';
@@ -348,9 +327,7 @@ async function enterDrawingMode() {
         document.addEventListener('mouseup', () => {
             isDraggingTextInput = false;
         });
-
- 
     }
 
     // 其他代码...
-};
+});
