@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 2; // 当前展示中间的海报索引
-    const posters = document.querySelectorAll('.poster');
+    const carousel = document.getElementById('carousel');
+    const posters = [];
     let currentPosterId;
 
     console.log("DOM content loaded and script running");
@@ -19,21 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log("Poster data:", data);
-                let posterElement;
-                if (doc.id === 'poster01') {
-                    posterElement = document.getElementById('poster-1');
-                } else if (doc.id === 'poster02') {
-                    posterElement = document.getElementById('poster-2');
-                } else if (doc.id === 'poster03') {
-                    posterElement = document.getElementById('poster-3');
-                } else if (doc.id === 'poster04') {
-                    posterElement = document.getElementById('poster-4');
-                }
-                if (posterElement) {
-                    posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
-                    posterElement.dataset.posterId = doc.id;
-                    console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
-                }
+                const posterElement = document.createElement('div');
+                posterElement.className = 'poster';
+                posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
+                posterElement.dataset.posterId = doc.id;
+                posters.push(posterElement);
+                carousel.appendChild(posterElement);
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
@@ -45,11 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 轮播功能
     prevButton.addEventListener('click', () => {
+        console.log("Previous button clicked");
         currentIndex = (currentIndex - 1 + posters.length) % posters.length;
         updateCarousel();
     });
 
     nextButton.addEventListener('click', () => {
+        console.log("Next button clicked");
         currentIndex = (currentIndex + 1) % posters.length;
         updateCarousel();
     });
@@ -257,6 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 textInput.style.display = 'none';
             }
             isTextMode = !isTextMode;
+            console.log("Text mode toggled. Current mode:", isTextMode);
         });
 
         textInput.addEventListener('blur', () => {
@@ -272,6 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             textInput.style.display = 'none';
             isTextMode = false;
+            console.log("Text input submitted and hidden.");
         });
 
         textInput.addEventListener('mousedown', (event) => {
