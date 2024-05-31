@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
                     posterElement.dataset.posterId = doc.id;
-                    posterElement.dataset.open = data.open; // 添加开放状态
+                    posterElement.dataset.open = data.status === "current" ? "true" : "false"; // 修改为使用status字段表示开放状态
                     console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
                 }
             });
