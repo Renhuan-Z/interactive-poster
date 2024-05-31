@@ -2,7 +2,12 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded and script running");
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
     let currentPosterId;
+
+    console.log("Previous button element:", prevButton);
+    console.log("Next button element:", nextButton);
 
     // 从 Firebase Firestore 获取海报数据
     async function getPosters() {
@@ -49,13 +54,13 @@ document.addEventListener("DOMContentLoaded", function () {
     getPosters();
 
     // 轮播功能
-    document.getElementById('prev-button').addEventListener('click', () => {
+    prevButton.addEventListener('click', () => {
         console.log("Prev button clicked");
         currentIndex = (currentIndex - 1 + posters.length) % posters.length;
         updateCarousel();
     });
 
-    document.getElementById('next-button').addEventListener('click', () => {
+    nextButton.addEventListener('click', () => {
         console.log("Next button clicked");
         currentIndex = (currentIndex + 1) % posters.length;
         updateCarousel();
