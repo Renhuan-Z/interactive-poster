@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM content loaded and script running");
     let currentIndex = 2; // 当前展示中间的海报索引
-    const posters = document.querySelectorAll('.poster');
+    const carousel = document.getElementById('carousel');
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
     let currentPosterId;
+    let posters = []; // 动态获取的海报元素列表
 
     console.log("Previous button element:", prevButton);
     console.log("Next button element:", nextButton);
@@ -17,33 +18,16 @@ document.addEventListener("DOMContentLoaded", function () {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log("Poster data:", data);
-                let posterElement;
-                switch (doc.id) {
-                    case 'poster01':
-                        posterElement = document.getElementById('poster-1');
-                        break;
-                    case 'poster02':
-                        posterElement = document.getElementById('poster-2');
-                        break;
-                    case 'poster03':
-                        posterElement = document.getElementById('poster-3');
-                        break;
-                    case 'poster04':
-                        posterElement = document.getElementById('poster-4');
-                        break;
-                    case 'poster05':
-                        posterElement = document.getElementById('poster-5');
-                        break;
-                    default:
-                        console.warn(`No element for ${doc.id}`);
-                        return;
-                }
-                if (posterElement) {
-                    posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
-                    posterElement.dataset.posterId = doc.id;
-                    posterElement.dataset.open = data.status === "current" ? "true" : "false"; // 修改为使用status字段表示开放状态
-                    console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
-                }
+                
+                const posterElement = document.createElement('div');
+                posterElement.className = 'poster';
+                posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
+                posterElement.dataset.posterId = doc.id;
+                posterElement.dataset.open = data.status === "current" ? "true" : "false";
+                carousel.appendChild(posterElement);
+                posters.push(posterElement);
+                
+                console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
@@ -94,15 +78,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Carousel updated. Current index:", currentIndex);
     }
 
-    posters.forEach(poster => {
-        poster.addEventListener('click', () => {
+    carousel.addEventListener('click', event => {
+        const poster = event.target.closest('.poster');
+        if (poster) {
             console.log(`Poster clicked: ${poster.dataset.posterId}`);
             if (poster.classList.contains('current') && poster.dataset.open === "true") {
                 console.log("Opening drawing mode for poster:", poster.dataset.posterId);
                 currentPosterId = poster.dataset.posterId;
                 enterDrawingMode();
             }
-        });
+        }
     });
 
     // 进入绘制模式
