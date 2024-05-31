@@ -171,31 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('color-picker').addEventListener('input', event => { currentColor = event.target.value; });
         document.getElementById('brush-size').addEventListener('input', event => { currentBrushSize = event.target.value; });
-
-        document.getElementById('exit-button').addEventListener('click', () => {
-            document.getElementById('carousel-container').style.display = 'flex';
-            document.getElementById('editor').style.display = 'none';
-        });
-
-        document.getElementById('save-button').addEventListener('click', async () => {
-            try {
-                const batch = db.batch();
-                const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
-
-                history.forEach((path, pathIndex) => {
-                    path.forEach(point => {
-                        const pointRef = drawingsRef.doc();
-                        batch.set(pointRef, { ...point, pathIndex });
-                    });
-                });
-
-                await batch.commit();
-                alert('Drawing saved');
-            } catch (error) {
-                console.error('Error saving drawing:', error);
-            }
-        });
-
+        
         // 双指拖动功能
         let isDragging = false;
         let startX, startY;
