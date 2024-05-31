@@ -25,6 +25,7 @@
     background-repeat: no-repeat;
     background-position: center;
     transition: transform 0.5s, filter 0.5s, opacity 0.5s;
+    height: auto;
 }
 
 .poster.current {
