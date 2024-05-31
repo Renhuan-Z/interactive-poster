@@ -49,11 +49,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 轮播功能
     document.getElementById('prev-button').addEventListener('click', () => {
+        console.log("Prev button clicked");
         currentIndex = (currentIndex - 1 + posters.length) % posters.length;
         updateCarousel();
     });
 
     document.getElementById('next-button').addEventListener('click', () => {
+        console.log("Next button clicked");
         currentIndex = (currentIndex + 1) % posters.length;
         updateCarousel();
     });
@@ -247,5 +249,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
 
