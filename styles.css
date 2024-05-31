@@ -75,7 +75,7 @@
     justify-content: center;
     width: 100vw; /* 使编辑器宽度为视口宽度 */
     height: auto; /* 使编辑器高度自适应内容 */
-     /* 防止溢出 */
+    overflow: hidden; /* 防止溢出 */
 }
 
 #drawing-canvas {
@@ -95,6 +95,7 @@
     display: flex;
     gap: 10px;
 }
+
 
 
 
