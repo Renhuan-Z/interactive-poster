@@ -72,7 +72,7 @@
     align-items: center;
     justify-content: center;
     width: 100vw; /* 使编辑器宽度为视口宽度 */
-    height: 100vh; /* 使编辑器高度为视口高度 */
+    height: auto; /* 使编辑器高度自适应内容 */
     overflow: hidden; /* 防止溢出 */
 }
 
@@ -80,8 +80,8 @@
     border: 1px solid black;
     width: 100%; /* 使画布宽度占据编辑器的全部宽度 */
     height: auto; /* 高度自适应 */
-    max-height: 100%; /* 防止画布高度超过编辑器高度 */
 }
+
 
 #color-picker, #brush-size, #text-button, #save-button, #exit-button {
     margin: 10px;
