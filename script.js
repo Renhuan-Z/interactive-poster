@@ -122,6 +122,37 @@ async function enterDrawingMode() {
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
 
+        async function enterDrawingMode() {
+        console.log("Entering drawing mode for poster:", currentPosterId);
+        document.getElementById('carousel-container').style.display = 'none';
+        document.getElementById('editor').style.display = 'flex';
+        const canvas = document.getElementById('drawing-canvas');
+        const context = canvas.getContext('2d');
+
+        const currentPosterElement = posters[currentIndex];
+        const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
+
+        const img = new Image();
+        img.src = posterBackgroundImage;
+
+        img.onload = () => {
+            // 设置画布宽度和高度，并保持比例
+            const width = window.innerWidth;
+            const height = (img.height / img.width) * width;
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            loadDrawings(); // 确保在图像加载后调用
+        };
+
+        let drawing = false;
+        let currentPath = [];
+        let history = [];
+        let currentColor = '#000000';
+        let currentBrushSize = 5;
+        let isTextMode = false;
+        let textInputPosition = { x: 0, y: 0 };
+
         async function loadDrawings() {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
@@ -143,7 +174,7 @@ async function enterDrawingMode() {
                     path.forEach((point, index) => {
                         if (point.type === 'text') {
                             context.fillStyle = point.color;
-                            context.font = '12px Arial';
+                            context.font = '16px Arial';
                             context.fillText(point.text, point.x, point.y);
                         } else {
                             context.strokeStyle = point.color;
@@ -262,7 +293,61 @@ async function enterDrawingMode() {
         canvas.addEventListener('touchmove', handleTouchMove);
         canvas.addEventListener('touchend', handleTouchEnd);
         canvas.addEventListener('touchcancel', handleTouchEnd);
-    }
 
-    // 其他代码...
+        // 文本输入框功能
+        const textInput = document.getElementById('text-input');
+
+        document.getElementById('text-button').addEventListener('click', () => {
+            if (!isTextMode) {
+                textInput.style.display = 'block';
+                textInput.style.left = '50%';
+                textInput.style.top = '50%';
+                textInput.focus();
+            } else {
+                textInput.style.display = 'none';
+            }
+            isTextMode = !isTextMode;
+        });
+
+        textInput.addEventListener('blur', () => {
+            if (textInput.value) {
+                const rect = canvas.getBoundingClientRect();
+                const x = textInput.offsetLeft - rect.left;
+                const y = textInput.offsetTop - rect.top;
+                context.fillStyle = currentColor;
+                context.font = '16px Arial';
+                context.fillText(textInput.value, x, y);
+                history.push([{ type: 'text', text: textInput.value, x, y, color: currentColor }]);
+                textInput.value = '';
+            }
+            textInput.style.display = 'none';
+            isTextMode = false;
+        });
+
+        textInput.addEventListener('mousedown', (event) => {
+            event.stopPropagation(); // 防止触发画布上的 mousedown 事件
+        });
+
+        // 允许拖动输入框
+        let isDraggingTextInput = false;
+        let textInputStartX, textInputStartY;
+
+        textInput.addEventListener('mousedown', (event) => {
+            isDraggingTextInput = true;
+            textInputStartX = event.clientX - textInput.offsetLeft;
+            textInputStartY = event.clientY - textInput.offsetTop;
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (isDraggingTextInput) {
+                textInput.style.left = `${event.clientX - textInputStartX}px`;
+                textInput.style.top = `${event.clientY - textInputStartY}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingTextInput = false;
+        });
+
+    }
 });
