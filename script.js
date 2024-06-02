@@ -185,7 +185,34 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('editor').style.display = 'none';
         });
 
-        document.getElementById('save-button').addEventListener('click', async () => {
+        document.getElementById('save-button').addEventListener('click', () => {
+            showPromptDialog();
+        });
+
+        function showPromptDialog() {
+            const promptDialog = document.createElement('div');
+            promptDialog.id = 'prompt-dialog';
+            promptDialog.innerHTML = `
+                <div id="prompt-content">
+                    <label for="alcohol-input">请描述你留言之前喝了多少酒:</label>
+                    <input type="text" id="alcohol-input" />
+                    <button id="prompt-ok-button">确定</button>
+                </div>
+            `;
+            document.body.appendChild(promptDialog);
+
+            document.getElementById('prompt-ok-button').addEventListener('click', async () => {
+                const alcoholInput = document.getElementById('alcohol-input').value;
+                if (alcoholInput) {
+                    saveDrawing(alcoholInput);
+                    document.body.removeChild(promptDialog);
+                } else {
+                    alert('请填写喝酒信息后再保存。');
+                }
+            });
+        }
+
+        async function saveDrawing(alcoholInput) {
             try {
                 const batch = db.batch();
                 const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
@@ -193,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 history.forEach((path, pathIndex) => {
                     path.forEach(point => {
                         const pointRef = drawingsRef.doc();
-                        batch.set(pointRef, { ...point, pathIndex });
+                        batch.set(pointRef, { ...point, pathIndex, alcoholInput });
                     });
                 });
 
@@ -202,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
                 console.error('Error saving drawing:', error);
             }
-        });
+        }
 
         function resizeCanvas() {
             // 调整画布大小以适应屏幕宽度并保持比例
@@ -314,3 +341,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
