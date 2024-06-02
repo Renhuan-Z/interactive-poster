@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     posterElement = document.getElementById('poster-3');
                 } else if (doc.id === 'poster04') {
                     posterElement = document.getElementById('poster-4');
+                } else if (doc.id === 'poster05') {
+                    posterElement = document.getElementById('poster-5');
                 }
                 if (posterElement) {
                     posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
@@ -311,7 +313,4 @@ document.addEventListener("DOMContentLoaded", function () {
             isDraggingTextInput = false;
         });
     }
-
-    // 其他代码...
 });
-
