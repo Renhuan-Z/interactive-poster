@@ -134,3 +134,19 @@
     font-size: 16px;
     cursor: pointer;
 }
+
+.text-element {
+    position: absolute;
+    background: transparent;
+    color: transparent;
+}
+
+#tooltip {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+}
+
