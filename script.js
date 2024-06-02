@@ -102,11 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         img.onload = () => {
             // 设置画布宽度和高度，并保持比例
-            const width = window.innerWidth;
-            const height = (img.height / img.width) * width;
-            canvas.width = width;
-            canvas.height = height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resizeCanvas(img);
             loadDrawings(); // 确保在图像加载后调用
         };
 
@@ -121,41 +117,38 @@ document.addEventListener("DOMContentLoaded", function () {
         async function loadDrawings() {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-                const paths = {};
+                const paths = [];
 
                 snapshot.forEach(doc => {
                     const point = doc.data();
-                    if (!paths[point.pathIndex]) {
-                        paths[point.pathIndex] = [];
-                    }
-                    paths[point.pathIndex].push(point);
+                    paths.push(point);
                 });
 
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
 
-                Object.values(paths).forEach(path => {
+                paths.forEach(path => {
                     context.beginPath();
-                    path.forEach((point, index) => {
+                    path.points.forEach((point, index) => {
                         if (point.type === 'text') {
                             context.fillStyle = point.color;
                             context.font = '16px Arial';
-                            context.fillText(point.text, point.x, point.y);
+                            context.fillText(point.text, point.x * canvas.width, point.y * canvas.height);
 
                             // 添加悬停事件监听器
                             const textElement = createTextElement(point);
                             canvas.parentElement.appendChild(textElement);
-                            textElement.style.left = `${point.x}px`;
-                            textElement.style.top = `${point.y}px`;
+                            textElement.style.left = `${point.x * canvas.width}px`;
+                            textElement.style.top = `${point.y * canvas.height}px`;
                             textElement.addEventListener('mouseover', () => showTooltip(textElement, point));
                             textElement.addEventListener('mouseout', hideTooltip);
                         } else {
                             context.strokeStyle = point.color;
                             context.lineWidth = point.size;
                             if (index === 0) {
-                                context.moveTo(point.x, point.y);
+                                context.moveTo(point.x * canvas.width, point.y * canvas.height);
                             } else {
-                                context.lineTo(point.x, point.y);
+                                context.lineTo(point.x * canvas.width, point.y * canvas.height);
                             }
                         }
                     });
@@ -199,12 +192,12 @@ document.addEventListener("DOMContentLoaded", function () {
             context.lineCap = 'round';
             context.strokeStyle = currentColor;
             const rect = canvas.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            context.lineTo(x, y);
+            const x = (event.clientX - rect.left) / canvas.width;
+            const y = (event.clientY - rect.top) / canvas.height;
+            context.lineTo(x * canvas.width, y * canvas.height);
             context.stroke();
             context.beginPath();
-            context.moveTo(x, y);
+            context.moveTo(x * canvas.width, y * canvas.height);
             currentPath.push({ x, y, color: currentColor, size: currentBrushSize });
         }
 
@@ -253,11 +246,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
 
                 history.forEach((path, pathIndex) => {
-                    path.forEach(point => {
-                        const pointRef = drawingsRef.doc();
-                        const timestamp = Date.now();
-                        batch.set(pointRef, { ...point, pathIndex, alcoholInput, timestamp });
-                    });
+                    const pointRef = drawingsRef.doc();
+                    const timestamp = Date.now();
+                    const pathData = { points: path.map(point => ({ ...point, x: point.x / canvas.width, y: point.y / canvas.height })), pathIndex, alcoholInput, timestamp };
+                    batch.set(pointRef, pathData);
                 });
 
                 await batch.commit();
@@ -267,17 +259,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        function resizeCanvas() {
-            // 调整画布大小以适应屏幕宽度并保持比例
+        function resizeCanvas(img) {
             const width = window.innerWidth;
-            const height = (canvas.height / canvas.width) * width;
+            const height = (img.height / img.width) * width;
             canvas.width = width;
             canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
             loadDrawings(); // 重新加载绘制内容
         }
 
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', () => resizeCanvas(img));
 
         // 添加双指拖动功能
         let isDragging = false;
@@ -339,11 +330,11 @@ document.addEventListener("DOMContentLoaded", function () {
         textInput.addEventListener('blur', () => {
             if (textInput.value) {
                 const rect = canvas.getBoundingClientRect();
-                const x = textInput.offsetLeft - rect.left;
-                const y = textInput.offsetTop - rect.top;
+                const x = (textInput.offsetLeft - rect.left) / canvas.width;
+                const y = (textInput.offsetTop - rect.top) / canvas.height;
                 context.fillStyle = currentColor;
                 context.font = '16px Arial';
-                context.fillText(textInput.value, x, y);
+                context.fillText(textInput.value, x * canvas.width, y * canvas.height);
                 const timestamp = Date.now();
                 history.push([{ type: 'text', text: textInput.value, x, y, color: currentColor, alcoholInput: '', timestamp }]);
                 textInput.value = '';
