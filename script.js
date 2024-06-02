@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         textInput.addEventListener('blur', () => {
-            if (textInput.value) {
+            if (textInput.value.trim() !== '') {
                 const rect = canvas.getBoundingClientRect();
                 const x = parseInt(textInput.style.left) - rect.left;
                 const y = parseInt(textInput.style.top) - rect.top;
