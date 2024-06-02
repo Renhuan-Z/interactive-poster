@@ -202,7 +202,19 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // 双指拖动功能
+        function resizeCanvas() {
+            // 调整画布大小以适应屏幕宽度并保持比例
+            const width = window.innerWidth;
+            const height = (canvas.height / canvas.width) * width;
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            loadDrawings(); // 重新加载绘制内容
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // 添加双指拖动功能
         let isDragging = false;
         let startX, startY;
         let initialPinchDistance = null;
@@ -262,8 +274,8 @@ document.addEventListener("DOMContentLoaded", function () {
         textInput.addEventListener('blur', () => {
             if (textInput.value) {
                 const rect = canvas.getBoundingClientRect();
-                const x = parseInt(textInput.style.left) - rect.left;
-                const y = parseInt(textInput.style.top) - rect.top;
+                const x = textInput.offsetLeft - rect.left;
+                const y = textInput.offsetTop - rect.top;
                 context.fillStyle = currentColor;
                 context.font = '16px Arial';
                 context.fillText(textInput.value, x, y);
@@ -299,5 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isDraggingTextInput = false;
         });
     }
+
+    // 其他代码...
 });
 
