@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 2; // 当前展示中间的海报索引
-    const carousel = document.getElementById('carousel');
-    const posters = [];
+    const posters = document.querySelectorAll('.poster');
     let currentPosterId;
 
     console.log("DOM content loaded and script running");
@@ -20,12 +19,21 @@ document.addEventListener("DOMContentLoaded", function () {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log("Poster data:", data);
-                const posterElement = document.createElement('div');
-                posterElement.className = 'poster';
-                posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
-                posterElement.dataset.posterId = doc.id;
-                posters.push(posterElement);
-                carousel.appendChild(posterElement);
+                let posterElement;
+                if (doc.id === 'poster01') {
+                    posterElement = document.getElementById('poster-1');
+                } else if (doc.id === 'poster02') {
+                    posterElement = document.getElementById('poster-2');
+                } else if (doc.id === 'poster03') {
+                    posterElement = document.getElementById('poster-3');
+                } else if (doc.id === 'poster04') {
+                    posterElement = document.getElementById('poster-4');
+                }
+                if (posterElement) {
+                    posterElement.style.backgroundImage = `url(${data.backgroundImageUrl})`;
+                    posterElement.dataset.posterId = doc.id;
+                    console.log(`Set background for ${doc.id} to ${data.backgroundImageUrl}`);
+                }
             });
             updateCarousel(); // 初始化海报状态
         } catch (error) {
@@ -37,13 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 轮播功能
     prevButton.addEventListener('click', () => {
-        console.log("Previous button clicked");
         currentIndex = (currentIndex - 1 + posters.length) % posters.length;
         updateCarousel();
     });
 
     nextButton.addEventListener('click', () => {
-        console.log("Next button clicked");
         currentIndex = (currentIndex + 1) % posters.length;
         updateCarousel();
     });
@@ -69,13 +75,14 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Carousel updated. Current index:", currentIndex);
     }
 
-    carousel.addEventListener('click', (event) => {
-        const clickedPoster = event.target.closest('.poster');
-        if (clickedPoster && clickedPoster.classList.contains('current')) {
-            currentPosterId = clickedPoster.dataset.posterId;
-            console.log("Poster clicked:", currentPosterId);
-            enterDrawingMode();
-        }
+    posters.forEach(poster => {
+        poster.addEventListener('click', () => {
+            if (poster.classList.contains('current')) {
+                currentPosterId = poster.dataset.posterId;
+                console.log("Poster clicked:", currentPosterId);
+                enterDrawingMode();
+            }
+        });
     });
 
     async function enterDrawingMode() {
@@ -171,6 +178,30 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('color-picker').addEventListener('input', event => { currentColor = event.target.value; });
         document.getElementById('brush-size').addEventListener('input', event => { currentBrushSize = event.target.value; });
 
+        document.getElementById('exit-button').addEventListener('click', () => {
+            document.getElementById('carousel-container').style.display = 'flex';
+            document.getElementById('editor').style.display = 'none';
+        });
+
+        document.getElementById('save-button').addEventListener('click', async () => {
+            try {
+                const batch = db.batch();
+                const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
+
+                history.forEach((path, pathIndex) => {
+                    path.forEach(point => {
+                        const pointRef = drawingsRef.doc();
+                        batch.set(pointRef, { ...point, pathIndex });
+                    });
+                });
+
+                await batch.commit();
+                alert('Drawing saved');
+            } catch (error) {
+                console.error('Error saving drawing:', error);
+            }
+        });
+
         // 双指拖动功能
         let isDragging = false;
         let startX, startY;
@@ -226,11 +257,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 textInput.style.display = 'none';
             }
             isTextMode = !isTextMode;
-            console.log("Text mode toggled. Current mode:", isTextMode);
         });
 
         textInput.addEventListener('blur', () => {
-            if (textInput.value.trim() !== '') {
+            if (textInput.value) {
                 const rect = canvas.getBoundingClientRect();
                 const x = parseInt(textInput.style.left) - rect.left;
                 const y = parseInt(textInput.style.top) - rect.top;
@@ -242,7 +272,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             textInput.style.display = 'none';
             isTextMode = false;
-            console.log("Text input submitted and hidden.");
         });
 
         textInput.addEventListener('mousedown', (event) => {
@@ -269,31 +298,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.addEventListener('mouseup', () => {
             isDraggingTextInput = false;
         });
-
-        // 保存绘画数据
-        document.getElementById('save-button').addEventListener('click', async () => {
-            try {
-                const batch = db.batch();
-                const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
-
-                history.forEach((path, pathIndex) => {
-                    path.forEach(point => {
-                        const pointRef = drawingsRef.doc();
-                        batch.set(pointRef, { ...point, pathIndex });
-                    });
-                });
-
-                await batch.commit();
-                alert('Drawing saved');
-            } catch (error) {
-                console.error('Error saving drawing:', error);
-            }
-        });
-
-        // 退出绘画模式
-        document.getElementById('exit-button').addEventListener('click', () => {
-            document.getElementById('carousel-container').style.display = 'flex';
-            document.getElementById('editor').style.display = 'none';
-        });
     }
 });
+
