@@ -141,6 +141,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             context.fillStyle = point.color;
                             context.font = '16px Arial';
                             context.fillText(point.text, point.x, point.y);
+
+                            // 添加悬停事件监听器
+                            const textElement = createTextElement(point);
+                            canvas.parentElement.appendChild(textElement);
+                            textElement.style.left = `${point.x}px`;
+                            textElement.style.top = `${point.y}px`;
+                            textElement.addEventListener('mouseover', () => showTooltip(textElement, point));
+                            textElement.addEventListener('mouseout', hideTooltip);
                         } else {
                             context.strokeStyle = point.color;
                             context.lineWidth = point.size;
@@ -155,6 +163,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             } catch (error) {
                 console.error('Error loading drawings:', error);
+            }
+        }
+
+        function createTextElement(point) {
+            const textElement = document.createElement('div');
+            textElement.classList.add('text-element');
+            textElement.textContent = point.text;
+            return textElement;
+        }
+
+        function showTooltip(element, point) {
+            const tooltip = document.createElement('div');
+            tooltip.id = 'tooltip';
+            tooltip.innerHTML = `
+                <div>酒量: ${point.alcoholInput}</div>
+                <div>保存时间: ${new Date(point.timestamp).toLocaleString()}</div>
+            `;
+            document.body.appendChild(tooltip);
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX}px`;
+            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight}px`;
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip) {
+                tooltip.remove();
             }
         }
 
@@ -220,7 +255,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 history.forEach((path, pathIndex) => {
                     path.forEach(point => {
                         const pointRef = drawingsRef.doc();
-                        batch.set(pointRef, { ...point, pathIndex, alcoholInput });
+                        const timestamp = Date.now();
+                        batch.set(pointRef, { ...point, pathIndex, alcoholInput, timestamp });
                     });
                 });
 
@@ -308,7 +344,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 context.fillStyle = currentColor;
                 context.font = '16px Arial';
                 context.fillText(textInput.value, x, y);
-                history.push([{ type: 'text', text: textInput.value, x, y, color: currentColor }]);
+                const timestamp = Date.now();
+                history.push([{ type: 'text', text: textInput.value, x, y, color: currentColor, alcoholInput: '', timestamp }]);
                 textInput.value = '';
             }
             textInput.style.display = 'none';
@@ -341,4 +378,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
