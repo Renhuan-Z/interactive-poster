@@ -4,7 +4,7 @@
     align-items: center;
     flex-direction: column;
     height: 100vh;
-    overflow: hidden; /* 防止海报超出容器 */
+    overflow: hidden;
 }
 
 #carousel {
@@ -28,19 +28,19 @@
 }
 
 .poster.current {
-    transform: scale(1.1); /* 放大10% */
+    transform: scale(1.1);
     z-index: 3;
     filter: none;
 }
 
 .poster.left-one, .poster.right-one {
-    transform: scale(1.0); /* 恢复正常比例 */
+    transform: scale(1.0);
     z-index: 2;
     filter: blur(3px);
 }
 
 .poster.left-two, .poster.right-two {
-    transform: scale(0.9); /* 缩小10% */
+    transform: scale(0.9);
     z-index: 1;
     filter: blur(5px);
     opacity: 0.7;
@@ -54,7 +54,7 @@
     border: none;
     font-size: 2rem;
     cursor: pointer;
-    z-index: 1000; /* 增加 z-index 确保按钮在最前 */
+    z-index: 1000;
 }
 
 #prev-button {
@@ -70,17 +70,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100vw; /* 使编辑器宽度为视口宽度 */
-    height: auto; /* 使编辑器高度自适应内容 */
-    overflow: hidden; /* 防止溢出 */
+    width: 100vw;
+    height: auto;
+    overflow: hidden;
 }
 
 #drawing-canvas {
     border: 1px solid black;
-    width: 100%; /* 使画布宽度占据编辑器的全部宽度 */
-    height: auto; /* 高度自适应 */
-    max-width: 100%; /* 确保宽度不超过容器 */
-    object-fit: contain; /* 保持比例 */
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
 }
 
 #controls {
