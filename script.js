@@ -69,14 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Carousel updated. Current index:", currentIndex);
     }
 
-    posters.forEach(poster => {
-        poster.addEventListener('click', () => {
-            if (poster.classList.contains('current')) {
-                currentPosterId = poster.dataset.posterId;
-                console.log("Poster clicked:", currentPosterId);
-                enterDrawingMode();
-            }
-        });
+    carousel.addEventListener('click', (event) => {
+        const clickedPoster = event.target.closest('.poster');
+        if (clickedPoster && clickedPoster.classList.contains('current')) {
+            currentPosterId = clickedPoster.dataset.posterId;
+            console.log("Poster clicked:", currentPosterId);
+            enterDrawingMode();
+        }
     });
 
     async function enterDrawingMode() {
@@ -171,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById('color-picker').addEventListener('input', event => { currentColor = event.target.value; });
         document.getElementById('brush-size').addEventListener('input', event => { currentBrushSize = event.target.value; });
-        
+
         // 双指拖动功能
         let isDragging = false;
         let startX, startY;
@@ -269,6 +268,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.addEventListener('mouseup', () => {
             isDraggingTextInput = false;
+        });
+
+        // 保存绘画数据
+        document.getElementById('save-button').addEventListener('click', async () => {
+            try {
+                const batch = db.batch();
+                const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
+
+                history.forEach((path, pathIndex) => {
+                    path.forEach(point => {
+                        const pointRef = drawingsRef.doc();
+                        batch.set(pointRef, { ...point, pathIndex });
+                    });
+                });
+
+                await batch.commit();
+                alert('Drawing saved');
+            } catch (error) {
+                console.error('Error saving drawing:', error);
+            }
+        });
+
+        // 退出绘画模式
+        document.getElementById('exit-button').addEventListener('click', () => {
+            document.getElementById('carousel-container').style.display = 'flex';
+            document.getElementById('editor').style.display = 'none';
         });
     }
 });
