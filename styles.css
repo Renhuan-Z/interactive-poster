@@ -1,3 +1,9 @@
+/* 设置页面背景颜色为黑色 */
+body {
+    background-color: black;
+}
+
+/* #carousel-container 样式保持不变 */
 #carousel-container {
     display: flex;
     justify-content: center;
@@ -7,6 +13,7 @@
     overflow: hidden; /* 防止海报超出容器 */
 }
 
+/* #carousel 样式保持不变 */
 #carousel {
     display: flex;
     justify-content: center;
@@ -16,6 +23,7 @@
     position: relative;
 }
 
+/* .poster 样式保持不变 */
 .poster {
     flex-shrink: 0;
     width: 20%;
@@ -27,18 +35,21 @@
     transition: transform 0.5s, filter 0.5s, opacity 0.5s;
 }
 
+/* .poster.current 样式保持不变 */
 .poster.current {
     transform: scale(1.1); /* 放大10% */
     z-index: 3;
     filter: none;
 }
 
+/* .poster.left-one, .poster.right-one 样式保持不变 */
 .poster.left-one, .poster.right-one {
     transform: scale(1.0); /* 恢复正常比例 */
     z-index: 2;
     filter: blur(3px);
 }
 
+/* .poster.left-two, .poster.right-two 样式保持不变 */
 .poster.left-two, .poster.right-two {
     transform: scale(0.9); /* 缩小10% */
     z-index: 1;
@@ -46,6 +57,7 @@
     opacity: 0.7;
 }
 
+/* #prev-button, #next-button 样式保持不变 */
 #prev-button, #next-button {
     position: absolute;
     top: 50%;
@@ -57,14 +69,17 @@
     z-index: 1000; /* 增加 z-index 确保按钮在最前 */
 }
 
+/* #prev-button 样式保持不变 */
 #prev-button {
     left: 10px;
 }
 
+/* #next-button 样式保持不变 */
 #next-button {
     right: 10px;
 }
 
+/* #editor 样式保持不变 */
 #editor {
     display: none;
     flex-direction: column;
@@ -75,6 +90,7 @@
     overflow: hidden; /* 防止溢出 */
 }
 
+/* #drawing-canvas 样式保持不变 */
 #drawing-canvas {
     border: 1px solid black;
     width: 100%; /* 使画布宽度占据编辑器的全部宽度 */
@@ -83,6 +99,7 @@
     object-fit: contain; /* 保持比例 */
 }
 
+/* #controls 样式保持不变 */
 #controls {
     position: fixed;
     bottom: 20px;
@@ -92,6 +109,7 @@
     gap: 10px;
 }
 
+/* #text-input 样式保持不变 */
 #text-input {
     position: absolute;
     z-index: 10;
@@ -101,10 +119,12 @@
     font-size: 16px;
 }
 
+/* #color-picker, #brush-size, #text-button, #save-button, #exit-button 样式保持不变 */
 #color-picker, #brush-size, #text-button, #save-button, #exit-button {
     margin: 10px;
 }
 
+/* #prompt-dialog 样式保持不变 */
 #prompt-dialog {
     position: fixed;
     top: 50%;
@@ -117,6 +137,7 @@
     z-index: 1001;
 }
 
+/* #prompt-content 样式保持不变 */
 #prompt-content {
     display: flex;
     flex-direction: column;
@@ -124,23 +145,27 @@
     gap: 10px;
 }
 
+/* #prompt-content input 样式保持不变 */
 #prompt-content input {
     padding: 5px;
     font-size: 16px;
 }
 
+/* #prompt-content button 样式保持不变 */
 #prompt-content button {
     padding: 5px 10px;
     font-size: 16px;
     cursor: pointer;
 }
 
+/* .text-element 样式保持不变 */
 .text-element {
     position: absolute;
     background: transparent;
     color: transparent;
 }
 
+/* #tooltip 样式保持不变 */
 #tooltip {
     position: absolute;
     background: #fff;
@@ -150,3 +175,12 @@
     z-index: 1002;
 }
 
+/* 添加大写的 "AFTER DRINK" 样式 */
+#title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+}
