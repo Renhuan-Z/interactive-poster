@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         img.onload = () => {
             // 设置画布宽度和高度，并保持比例
             resizeCanvas(img);
-            loadDrawings(); // 确保在图像加载后调用
+            loadDrawings(img); // 确保在图像加载后调用
         };
 
         let drawing = false;
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
 
-        async function loadDrawings() {
+        async function loadDrawings(img) {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
                 const paths = [];
@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
             canvas.width = width;
             canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings(); // 重新加载绘制内容
+            loadDrawings(img); // 重新加载绘制内容
         }
 
         window.addEventListener('resize', () => resizeCanvas(img));
