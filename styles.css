@@ -57,7 +57,6 @@ body {
     opacity: 0.7;
 }
 
-/* 调整 #prev-button 和 #next-button 样式 */
 #prev-button, #next-button {
     position: absolute;
     top: 50%;
@@ -70,12 +69,10 @@ body {
     z-index: 1000; /* 增加 z-index 确保按钮在最前 */
 }
 
-/* #prev-button 样式保持不变 */
 #prev-button {
     left: 10px;
 }
 
-/* #next-button 样式保持不变 */
 #next-button {
     right: 10px;
 }
@@ -184,4 +181,12 @@ body {
     font-size: 8rem; /* 放大4倍 */
     color: white;
     font-weight: lighter; /* 使用细字体 */
+}
+.drawing-mode #title {
+    display: none;
+}
+
+.drawing-mode .poster {
+    transform: scale(1.5); /* 放大海报 */
+    transition: transform 0.5s;
 }
