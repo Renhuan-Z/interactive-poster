@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 2; // 当前展示中间的海报索引
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
+    let img = new Image();
 
     console.log("DOM content loaded and script running");
 
@@ -97,13 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentPosterElement = posters[currentIndex];
         const posterBackgroundImage = currentPosterElement.style.backgroundImage.slice(5, -2);
 
-        const img = new Image();
         img.src = posterBackgroundImage;
 
         img.onload = () => {
             // 设置画布宽度和高度，并保持比例
-            resizeCanvas(img);
-            loadDrawings(img); // 确保在图像加载后调用
+            resizeCanvas();
+            loadDrawings(); // 确保在图像加载后调用
         };
 
         let drawing = false;
@@ -114,66 +114,62 @@ document.addEventListener("DOMContentLoaded", function () {
         let isTextMode = false;
         let textInputPosition = { x: 0, y: 0 };
 
-        async function loadDrawings(img) {
+        async function loadDrawings() {
             try {
                 const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-                const paths = [];
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    paths.push(data); // Ensure we push the entire data object
-                });
-
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
 
-                paths.forEach(path => {
-                    context.beginPath();
-                    if (path.points && Array.isArray(path.points)) { // Ensure path.points is defined and is an array
-                        path.points.forEach((point, index) => {
-                            if (point.type === 'text') {
-                                context.fillStyle = point.color;
-                                context.font = '16px Arial';
-                                context.fillText(point.text, point.x * canvas.width, point.y * canvas.height);
-
-                                // 添加悬停事件监听器
-                                const textElement = createTextElement(point);
-                                canvas.parentElement.appendChild(textElement);
-                                textElement.style.left = `${point.x * canvas.width}px`;
-                                textElement.style.top = `${point.y * canvas.height}px`;
-                                textElement.addEventListener('mouseover', () => showTooltip(textElement, point));
-                                textElement.addEventListener('mouseout', hideTooltip);
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.type === 'drawing') {
+                        context.beginPath();
+                        data.points.forEach((point, index) => {
+                            const x = point.x * canvas.width;
+                            const y = point.y * canvas.height;
+                            context.strokeStyle = point.color;
+                            context.lineWidth = point.size;
+                            if (index === 0) {
+                                context.moveTo(x, y);
                             } else {
-                                context.strokeStyle = point.color;
-                                context.lineWidth = point.size;
-                                if (index === 0) {
-                                    context.moveTo(point.x * canvas.width, point.y * canvas.height);
-                                } else {
-                                    context.lineTo(point.x * canvas.width, point.y * canvas.height);
-                                }
+                                context.lineTo(x, y);
                             }
                         });
+                        context.stroke();
+                    } else if (data.type === 'text') {
+                        const x = data.x * canvas.width;
+                        const y = data.y * canvas.height;
+                        context.fillStyle = data.color;
+                        context.font = '16px Arial';
+                        context.fillText(data.text, x, y);
+
+                        // 添加悬停事件监听器
+                        const textElement = createTextElement(data);
+                        canvas.parentElement.appendChild(textElement);
+                        textElement.style.left = `${x}px`;
+                        textElement.style.top = `${y}px`;
+                        textElement.addEventListener('mouseover', () => showTooltip(textElement, data));
+                        textElement.addEventListener('mouseout', hideTooltip);
                     }
-                    context.stroke();
                 });
             } catch (error) {
                 console.error('Error loading drawings:', error);
             }
         }
 
-        function createTextElement(point) {
+        function createTextElement(data) {
             const textElement = document.createElement('div');
             textElement.classList.add('text-element');
-            textElement.textContent = point.text;
+            textElement.textContent = data.text;
             return textElement;
         }
 
-        function showTooltip(element, point) {
+        function showTooltip(element, data) {
             const tooltip = document.createElement('div');
             tooltip.id = 'tooltip';
             tooltip.innerHTML = `
-                <div>酒量: ${point.alcoholInput}</div>
-                <div>保存时间: ${new Date(point.timestamp).toLocaleString()}</div>
+                <div>酒量: ${data.alcoholInput}</div>
+                <div>保存时间: ${new Date(data.timestamp).toLocaleString()}</div>
             `;
             document.body.appendChild(tooltip);
             const rect = element.getBoundingClientRect();
@@ -250,7 +246,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 history.forEach((path, pathIndex) => {
                     const pointRef = drawingsRef.doc();
                     const timestamp = Date.now();
-                    const pathData = { points: path.map(point => ({ ...point, x: point.x / canvas.width, y: point.y / canvas.height })), pathIndex, alcoholInput, timestamp };
+                    const pathData = {
+                        type: 'drawing',
+                        points: path.map(point => ({ ...point, x: point.x / canvas.width, y: point.y / canvas.height })),
+                        pathIndex,
+                        alcoholInput,
+                        timestamp
+                    };
                     batch.set(pointRef, pathData);
                 });
 
@@ -261,16 +263,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        function resizeCanvas(img) {
+        function resizeCanvas() {
             const width = window.innerWidth;
             const height = (img.height / img.width) * width;
             canvas.width = width;
             canvas.height = height;
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            loadDrawings(img); // 重新加载绘制内容
+            loadDrawings(); // 重新加载绘制内容
         }
 
-        window.addEventListener('resize', () => resizeCanvas(img));
+        window.addEventListener('resize', () => resizeCanvas());
 
         // 添加双指拖动功能
         let isDragging = false;
@@ -338,7 +340,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 context.font = '16px Arial';
                 context.fillText(textInput.value, x * canvas.width, y * canvas.height);
                 const timestamp = Date.now();
-                history.push([{ type: 'text', text: textInput.value, x, y, color: currentColor, alcoholInput: '', timestamp }]);
+                const textData = {
+                    type: 'text',
+                    x,
+                    y,
+                    text: textInput.value,
+                    color: currentColor,
+                    alcoholInput: '',
+                    timestamp
+                };
+                history.push(textData);
+                saveText(textData); // 保存文本数据
                 textInput.value = '';
             }
             textInput.style.display = 'none';
@@ -369,6 +381,14 @@ document.addEventListener("DOMContentLoaded", function () {
         document.addEventListener('mouseup', () => {
             isDraggingTextInput = false;
         });
+
+        async function saveText(textData) {
+            try {
+                const textRef = db.collection('posters').doc(currentPosterId).collection('drawings').doc();
+                await textRef.set(textData);
+            } catch (error) {
+                console.error('Error saving text:', error);
+            }
+        }
     }
 });
-
