@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
     let img = new Image();
-    let currentDrawingImageUrl;
+    img.crossOrigin = "anonymous";  // 确保跨域加载
 
     console.log("DOM content loaded and script running");
 
@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const data = doc.data();
                     if (data.type === 'drawing') {
                         const drawingImage = new Image();
+                        drawingImage.crossOrigin = "anonymous";  // 确保跨域加载
                         drawingImage.src = data.url;
                         drawingImage.onload = () => {
                             context.drawImage(drawingImage, 0, 0, canvas.width, canvas.height);
