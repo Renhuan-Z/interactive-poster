@@ -115,51 +115,51 @@ document.addEventListener("DOMContentLoaded", function () {
         let textInputPosition = { x: 0, y: 0 };
 
         async function loadDrawings() {
-    try {
-        const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
-        const paths = [];
+            try {
+                const snapshot = await db.collection('posters').doc(currentPosterId).collection('drawings').get();
+                const paths = [];
 
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            paths.push(data); // Ensure we push the entire data object
-        });
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
-
-        paths.forEach(path => {
-            context.beginPath();
-            if (path.points && Array.isArray(path.points)) { // Ensure path.points is defined and is an array
-                path.points.forEach((point, index) => {
-                    if (point.type === 'text') {
-                        context.fillStyle = point.color;
-                        context.font = '16px Arial';
-                        context.fillText(point.text, point.x * canvas.width, point.y * canvas.height);
-
-                        // 添加悬停事件监听器
-                        const textElement = createTextElement(point);
-                        canvas.parentElement.appendChild(textElement);
-                        textElement.style.left = `${point.x * canvas.width}px`;
-                        textElement.style.top = `${point.y * canvas.height}px`;
-                        textElement.addEventListener('mouseover', () => showTooltip(textElement, point));
-                        textElement.addEventListener('mouseout', hideTooltip);
-                    } else {
-                        context.strokeStyle = point.color;
-                        context.lineWidth = point.size;
-                        if (index === 0) {
-                            context.moveTo(point.x * canvas.width, point.y * canvas.height);
-                        } else {
-                            context.lineTo(point.x * canvas.width, point.y * canvas.height);
-                        }
-                    }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    paths.push(data); // Ensure we push the entire data object
                 });
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(img, 0, 0, canvas.width, canvas.height); // 绘制背景图片
+
+                paths.forEach(path => {
+                    context.beginPath();
+                    if (path.points && Array.isArray(path.points)) { // Ensure path.points is defined and is an array
+                        path.points.forEach((point, index) => {
+                            if (point.type === 'text') {
+                                context.fillStyle = point.color;
+                                context.font = '16px Arial';
+                                context.fillText(point.text, point.x * canvas.width, point.y * canvas.height);
+
+                                // 添加悬停事件监听器
+                                const textElement = createTextElement(point);
+                                canvas.parentElement.appendChild(textElement);
+                                textElement.style.left = `${point.x * canvas.width}px`;
+                                textElement.style.top = `${point.y * canvas.height}px`;
+                                textElement.addEventListener('mouseover', () => showTooltip(textElement, point));
+                                textElement.addEventListener('mouseout', hideTooltip);
+                            } else {
+                                context.strokeStyle = point.color;
+                                context.lineWidth = point.size;
+                                if (index === 0) {
+                                    context.moveTo(point.x * canvas.width, point.y * canvas.height);
+                                } else {
+                                    context.lineTo(point.x * canvas.width, point.y * canvas.height);
+                                }
+                            }
+                        });
+                    }
+                    context.stroke();
+                });
+            } catch (error) {
+                console.error('Error loading drawings:', error);
             }
-            context.stroke();
-        });
-    } catch (error) {
-        console.error('Error loading drawings:', error);
-    }
-}
+        }
 
         function createTextElement(point) {
             const textElement = document.createElement('div');
