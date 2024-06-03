@@ -67,6 +67,7 @@ body {
     font-size: 2rem;
     cursor: pointer;
     z-index: 1000; /* 增加 z-index 确保按钮在最前 */
+    color: white;
 }
 
 /* #prev-button 样式保持不变 */
