@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const posters = document.querySelectorAll('.poster');
     let currentPosterId;
     let img = new Image();
+    let currentDrawingImageUrl;
 
     console.log("DOM content loaded and script running");
 
@@ -123,19 +124,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.type === 'drawing') {
-                        context.beginPath();
-                        data.points.forEach((point, index) => {
-                            const x = point.x * canvas.width;
-                            const y = point.y * canvas.height;
-                            context.strokeStyle = point.color;
-                            context.lineWidth = point.size;
-                            if (index === 0) {
-                                context.moveTo(x, y);
-                            } else {
-                                context.lineTo(x, y);
-                            }
-                        });
-                        context.stroke();
+                        const drawingImage = new Image();
+                        drawingImage.src = data.url;
+                        drawingImage.onload = () => {
+                            context.drawImage(drawingImage, 0, 0, canvas.width, canvas.height);
+                        };
                     } else if (data.type === 'text') {
                         const x = data.x * canvas.width;
                         const y = data.y * canvas.height;
@@ -240,21 +233,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         async function saveDrawing(alcoholInput) {
             try {
+                const drawingCanvas = document.createElement('canvas');
+                const drawingContext = drawingCanvas.getContext('2d');
+                drawingCanvas.width = canvas.width;
+                drawingCanvas.height = canvas.height;
+                drawingContext.drawImage(canvas, 0, 0);
+                const drawingDataUrl = drawingCanvas.toDataURL('image/png');
+
+                const storageRef = firebase.storage().ref();
+                const drawingRef = storageRef.child(`drawings/${currentPosterId}_${Date.now()}.png`);
+                await drawingRef.putString(drawingDataUrl, 'data_url');
+                const drawingUrl = await drawingRef.getDownloadURL();
+
                 const batch = db.batch();
                 const drawingsRef = db.collection('posters').doc(currentPosterId).collection('drawings');
 
-                history.forEach((path, pathIndex) => {
-                    const pointRef = drawingsRef.doc();
-                    const timestamp = Date.now();
-                    const pathData = {
-                        type: 'drawing',
-                        points: path.map(point => ({ ...point, x: point.x / canvas.width, y: point.y / canvas.height })),
-                        pathIndex,
-                        alcoholInput,
-                        timestamp
-                    };
-                    batch.set(pointRef, pathData);
-                });
+                const drawingData = {
+                    type: 'drawing',
+                    url: drawingUrl,
+                    alcoholInput,
+                    timestamp: Date.now()
+                };
+                const drawingDocRef = drawingsRef.doc();
+                batch.set(drawingDocRef, drawingData);
 
                 await batch.commit();
                 alert('Drawing saved');
